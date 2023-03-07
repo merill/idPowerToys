@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Identity.Web.MicrosoftGraphBeta" Version="2.5.0" />
+    <PackageReference Include="Syncfusion.Presentation.Net.Core" Version="20.4.0.52" />
+  </ItemGroup>
+
+</Project>
