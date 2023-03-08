@@ -13,6 +13,13 @@ import {
     CalendarMonthRegular,
 } from "@fluentui/react-icons";
 import { useState } from 'react';
+import {
+    Accordion,
+    AccordionHeader,
+    AccordionItem,
+    AccordionPanel,
+} from "@fluentui/react-components";
+import { VSCTerminalPowershell } from '@icongo/vsc';
 
 
 const useStyles = makeStyles({
@@ -83,17 +90,35 @@ export const CaDocGenManual = () => {
     return (
         <>
             <div className={styles.base}>
-                <p>Follow the steps below to manually generate the documentation without signing into this app.</p>
-                <p>Graph Explorer</p>
-                    <ul>
-                        <li>Open <a target="_blank" href="https://developer.microsoft.com/en-us/graph/graph-explorer?request=policies%2FconditionalAccessPolicies&method=GET&version=beta&GraphUrl=https://graph.microsoft.com">Graph Explorer</a></li>
-                        <li>Run a query for <b>'https://graph.microsoft.com/beta/policies/conditionalAccessPolicies'</b></li>
-                        <li>Highlight and copy the content from the <b>Response preview</b> panel</li>
-                        <li>Paste the content below and click <b>Generate documentation</b></li>
-                    </ul>
-                <p>Graph PowerShell</p>
-                <p>Run this command to copy the policies to the clipboard and paste into the text box below.</p>
-                <small><code>Invoke-GraphRequest -Uri 'https://graph.microsoft.com/v1.0/policies/conditionalAccessPolicies' -OutputType Json | Set-Clipboard</code></small>
+                <p>Use one of the options below to manually generate the documentation without signing into idPowerToys.</p>
+                <p>Documentation generated manually will not include the names of users, apps and other directory objects.</p>
+
+                <Accordion>
+                    <AccordionItem value="1">
+                        <AccordionHeader icon={<CalendarMonthRegular />}>
+                            Graph Explorer
+                        </AccordionHeader>
+                        <AccordionPanel>
+                            <ul>
+                                <li>Open <a target="_blank" href="https://developer.microsoft.com/en-us/graph/graph-explorer?request=policies%2FconditionalAccessPolicies&method=GET&version=beta&GraphUrl=https://graph.microsoft.com">Graph Explorer</a></li>
+                                <li>Run a query for <b>'https://graph.microsoft.com/beta/policies/conditionalAccessPolicies'</b></li>
+                                <li>Highlight and copy the content from the <b>Response preview</b> panel</li>
+                                <li>Paste the content below and click <b>Generate documentation</b></li>
+                            </ul>
+                        </AccordionPanel>
+                    </AccordionItem>
+                    <AccordionItem value="2">
+                        <AccordionHeader icon={<VSCTerminalPowershell width={16}/>}>
+                            Graph PowerShell
+                        </AccordionHeader>
+                        <AccordionPanel>
+                            <ul>
+                                <li>Run this command to copy the policies to the clipboard and paste into the text box below.</li>
+                                <li><small><code>Invoke-GraphRequest -Uri 'https://graph.microsoft.com/v1.0/policies/conditionalAccessPolicies' -OutputType Json | Set-Clipboard</code></small></li>
+                            </ul>
+                        </AccordionPanel>
+                    </AccordionItem>
+                </Accordion>
                 <Label htmlFor={textareaId}>
                 </Label>
                 <Textarea
