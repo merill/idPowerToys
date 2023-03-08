@@ -18,6 +18,7 @@ import {
     bundleIcon,
 } from "@fluentui/react-icons";
 import { CaDocGenManual } from '../components/CaDocGenManual';
+import { CaDocGenAuto } from '../components/CaDocGenAuto';
 
 const AutoGeneration = bundleIcon(RocketFilled, RocketRegular);
 const ManualGeneration = bundleIcon(WindowDevToolsFilled, WindowDevToolsRegular);
@@ -97,7 +98,7 @@ export const CaDocGenTabs = () => {
                 </Tab>
             </TabList>
             <div className={styles.panels}>
-                {selectedValue === "autogeneration" && <Arrivals />}
+                {selectedValue === "autogeneration" && <CaDocGenAuto />}
                 {selectedValue === "manualgeneration" && <CaDocGenManual />}
             </div>
         </div>

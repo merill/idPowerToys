@@ -1,5 +1,8 @@
+using Azure.Core;
 using CADocGen.PowerPointGenerator;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
+using Microsoft.Graph;
 using webapi.Models;
 
 namespace webapi.Controllers;
@@ -37,9 +40,20 @@ public class WeatherForecastController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Post(GeneratePowerPointManualRequest policy)
     {
+        
         //Collect Graph data
         var graphData = new GraphData();
-        await graphData.ImportPolicy(policy.ConditionalAccessPolicyJson);
+        if(policy.IsManual == true)
+        {
+            await graphData.ImportPolicy(policy.ConditionalAccessPolicyJson);
+        }
+        else
+        {
+            StringValues accessToken;
+            Request.Headers.TryGetValue("X-PowerPointGeneration-Token", out accessToken);
+            await graphData.CollectData(accessToken);
+        }
+
 
         Response.Clear();
         //Generate and stream doc

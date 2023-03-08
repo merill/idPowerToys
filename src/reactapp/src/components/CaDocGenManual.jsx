@@ -20,7 +20,7 @@ import {
     AccordionPanel,
 } from "@fluentui/react-components";
 import { VSCTerminalPowershell } from '@icongo/vsc';
-
+import { Providers, ProviderState } from "@microsoft/mgt";
 
 const useStyles = makeStyles({
     base: {
@@ -50,16 +50,18 @@ export const CaDocGenManual = () => {
     const handleClick = async () => {
 
         let policy = {
-            conditionalAccessPolicyJson: caPolicyJson
+            conditionalAccessPolicyJson: caPolicyJson,
+            isManual: true
         };
 
         const options = {
             method: 'POST',
             headers: {
-                'Content-type': 'application/json'
+                'Content-type': 'application/json',
             },
             body: JSON.stringify(policy)
         };
+
 
         fetch('/weatherforecast', options)
             .then((response) => response.blob())

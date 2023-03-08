@@ -1,5 +1,7 @@
 ﻿using Microsoft.Graph;
+using Microsoft.Graph.CallRecords;
 using System.Collections.Specialized;
+using System.Net.Http.Headers;
 using System.Text.Json.Nodes;
 
 namespace CADocGen.PowerPointGenerator;
@@ -12,6 +14,19 @@ public class GraphData
     public ICollection<Organization>? Organization { get; set; }
     public User? Me { get; set; }
 
+
+    public async Task CollectData(string accessToken)
+    {
+        var graphClient = new GraphServiceClient("https://graph.microsoft.com/beta",
+            new DelegateAuthenticationProvider(async (requestMessage) =>
+            {
+                requestMessage.Headers.Authorization = new AuthenticationHeaderValue("bearer", accessToken);
+            }));
+
+        var graphHelper = new GraphHelper(graphClient);
+
+        await CollectData(graphHelper);
+    }
     public async Task CollectData(GraphHelper graph)
     {
         //TODO: Batch and call in parallel to improve perf
