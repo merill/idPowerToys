@@ -61,7 +61,7 @@ export const CaDocGenManual = () => {
             body: JSON.stringify(policy)
         };
 
-        fetch('weatherforecast', options)
+        fetch('/weatherforecast', options)
             .then((response) => response.blob())
             .then((blob) => {
 
