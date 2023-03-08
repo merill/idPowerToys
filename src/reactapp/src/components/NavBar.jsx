@@ -13,13 +13,10 @@ export const NavBar = () => {
                     <Button appearance="primary" onClick={() => navigate('/')} >Home</Button>
                 </li>
             </ul>
-            <h2>Assessments</h2>
+            <h2>Apps</h2>
             <ul>
                 <li>
-                    <Button appearance="primary" onClick={() => navigate('/ZeroTrustHome')} >Zero Trust Assessment</Button>
-                </li>
-                <li>
-                    <Button appearance="primary" onClick={() => navigate('/AzureADHome')}>Azure AD Assessment</Button>
+                    <Button appearance="primary" onClick={() => navigate('/cadoc/Home')} >CA Documenter</Button>
                 </li>
             </ul>
         </>

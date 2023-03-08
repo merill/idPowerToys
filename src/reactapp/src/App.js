@@ -3,7 +3,8 @@ import { PageLayout } from "./components/PageLayout";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import NoPage from "./pages/NoPage";
-
+import PagePrivacy from "./pages/Privacy"
+import PageCaDocHome from "./pages/cadoc/Home"
 
 function App() {
     return (
@@ -11,6 +12,8 @@ function App() {
             <Routes>
                 <Route path="/" element={<PageLayout />}>
                     <Route index element={<Home />} />
+                    <Route path="Privacy" element={<PagePrivacy />} />
+                    <Route path="/cadoc/Home" element={<PageCaDocHome />} />
                     <Route path="*" element={<NoPage />} />
                 </Route>
             </Routes>

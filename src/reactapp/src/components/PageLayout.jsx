@@ -1,6 +1,6 @@
 import React from "react";
 import { NavBar } from "./NavBar"
-import { Outlet } from "react-router-dom";
+import { Outlet, Link } from "react-router-dom";
 import { Login } from '@microsoft/mgt-react';
 
 export const PageLayout = (props) => {
@@ -37,13 +37,14 @@ export const PageLayout = (props) => {
                         
                     </div>
                     <div className="version">
-                        <small>
-                            <a target="_blank" href="https://icons8.com/icon/1CbCOtKH87xx/we-can-do-it">We Can Do It</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>&nbsp;
-                            |&nbsp;Presentation Components by <a target="_blank" href="https://www.syncfusion.com/">Syncfusion</a>
-                        </small>
                     </div>
                     <div className="copy">
-                        <small>Brought to you by <a target="_blank" href="https://merill.net/">Merill</a></small>
+                        <small>
+                            <a target="_blank" href="https://icons8.com/icon/1CbCOtKH87xx/we-can-do-it">We Can Do It</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
+                            &nbsp;|&nbsp;Presentation Components by <a target="_blank" href="https://www.syncfusion.com/">Syncfusion</a>
+                            &nbsp;|&nbsp;<Link to="/privacy">Privacy</Link>
+                            &nbsp;|&nbsp;Brought to you by <a target="_blank" href="https://merill.net/">Merill</a>
+                        </small>
                     </div>
                 </footer>
             </div>
