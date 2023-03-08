@@ -12,9 +12,6 @@ export const NavBar = () => {
                 <li>
                     <Button appearance="primary" onClick={() => navigate('/')} >Home</Button>
                 </li>
-            </ul>
-            <h2>Apps</h2>
-            <ul>
                 <li>
                     <Button appearance="primary" onClick={() => navigate('/cadoc/Home')} >Conditional Access Documenter</Button>
                 </li>

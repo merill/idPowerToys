@@ -1,13 +1,12 @@
 import React from 'react';
-import { CaDocGenManual } from '../../components/CaDocGen';
+import { CaDocGenTabs } from '../../components/CaDocGenTabs';
 
 function Home() {
     return (
         <>
             <h1>Conditional Access Documenter</h1>
-            <p>Generate a visual PowerPoint presentation of the conditional access policies in your tenant.</p>
-
-            <CaDocGenManual></CaDocGenManual>
+            <p>Export conditional access policies as a PowerPoint presentation.</p>
+            <CaDocGenTabs/>
         </>
     );
 }
