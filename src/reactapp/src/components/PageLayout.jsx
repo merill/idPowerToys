@@ -1,16 +1,16 @@
 import React from "react";
 import { NavBar } from "./NavBar"
-import { Outlet, Link } from "react-router-dom";
 import { Login } from '@microsoft/mgt-react';
+import { Link, Outlet } from "react-router-dom";
 
 export const PageLayout = (props) => {
     return (
         <>
             <div id="container">
                 <header>
-                    
+
                     <div className="logo" role="presentation" aria-hidden="true" itemProp="logo" itemScope="itemScope">
-                        <img src="/idPowerToysLogo.png" height="46"></img>    
+                        <img src="/idPowerToysLogo.png" height="46"></img>
                     </div>
                     <div className="colorgroup"></div>
                     <div className="profile">
@@ -34,16 +34,16 @@ export const PageLayout = (props) => {
                 </main>
                 <footer>
                     <div className="switches">
-                        
+                        <small>
+                            Brought to you by &nbsp;<a target="_blank" href="https://merill.net/">Merill</a>
+                        </small>
                     </div>
                     <div className="version">
                     </div>
                     <div className="copy">
                         <small>
-                            <a target="_blank" href="https://icons8.com/icon/1CbCOtKH87xx/we-can-do-it">We Can Do It</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
-                            &nbsp;|&nbsp;Presentation Components by <a target="_blank" href="https://www.syncfusion.com/">Syncfusion</a>
-                            &nbsp;|&nbsp;<Link to="/privacy">Privacy</Link>
-                            &nbsp;|&nbsp;Brought to you by <a target="_blank" href="https://merill.net/">Merill</a>
+                            <Link to="/about">About</Link>
+                            &nbsp;|&nbsp;<a target="_blank" href="https://merill.net/privacy">Privacy Policy</a>
                         </small>
                     </div>
                 </footer>

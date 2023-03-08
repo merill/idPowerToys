@@ -8,7 +8,7 @@ import { Providers } from '@microsoft/mgt-element';
 import { Msal2Provider } from '@microsoft/mgt-msal2-provider';
 
 Providers.globalProvider = new Msal2Provider({
-    clientId: 'afe793df-19e0-455a-8403-2e863379bfaa'
+    clientId: 'afe793df-19e0-455a-8403-2e863379bfaa',
 });
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

@@ -47,7 +47,7 @@ function Home() {
     return (
         <>
             <h1>What is idPowerToys?</h1>
-            <p>idPowerToys is a collection of mini-apps that I've been building (planning to build) that are related to Microsoft Entra and Azure Active Directory. This is a personal project and is not affilitiated with Microsoft.</p>
+            <p>idPowerToys is a collection of mini-apps that I've been building (planning to build) that are related to Microsoft Entra and Azure Active Directory. Please note this is a personal project and is not affilitiated or endorsed by Microsoft.</p>
 
             <h2 id="introduction">Conditional Access Documenter</h2>
             <p>Generate a PowerPoint presentation of your Conditional Access policies to help visualize and share.</p>
