@@ -9,6 +9,9 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+var key = builder.Configuration["Syncfusion:LicenseKey"];
+Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(key);
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

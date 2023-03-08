@@ -3,12 +3,19 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { FluentProvider, teamsLightTheme } from "@fluentui/react-components";
+import { Providers } from '@microsoft/mgt-element';
+import { Msal2Provider } from '@microsoft/mgt-msal2-provider';
+
+Providers.globalProvider = new Msal2Provider({
+    clientId: 'afe793df-19e0-455a-8403-2e863379bfaa'
+});
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
+    <FluentProvider theme={teamsLightTheme}>
+        <App />
+    </FluentProvider>
 );
 
 // If you want to start measuring performance in your app, pass a function
