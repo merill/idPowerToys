@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useState, useEffect } from 'react';
 import {
     makeStyles,
     tokens,
@@ -12,15 +13,9 @@ import {
     CalendarMonthFilled,
     CalendarMonthRegular,
 } from "@fluentui/react-icons";
-import { useState } from 'react';
-import {
-    Accordion,
-    AccordionHeader,
-    AccordionItem,
-    AccordionPanel,
-} from "@fluentui/react-components";
-import { VSCTerminalPowershell } from '@icongo/vsc';
+
 import { Providers, ProviderState } from "@microsoft/mgt";
+import { Login } from '@microsoft/mgt-react';
 
 const useStyles = makeStyles({
     base: {
@@ -41,16 +36,34 @@ const useStyles = makeStyles({
     },
 });
 
+function useIsSignedIn(): [boolean] {
+    const [isSignedIn, setIsSignedIn] = useState(false);
+
+    useEffect(() => {
+        const updateState = () => {
+            const provider = Providers.globalProvider;
+            setIsSignedIn(provider && provider.state === ProviderState.SignedIn);
+        };
+
+        Providers.onProviderUpdated(updateState);
+        updateState();
+
+        return () => {
+            Providers.removeProviderUpdatedListener(updateState);
+        }
+    }, []);
+
+    return [isSignedIn];
+}
 
 export const CaDocGenAuto = () => {
-    const textareaId = useId("textarea");
     const styles = useStyles();
-    const [caPolicyJson, setCaPolicyJson] = useState("");
+    const [isSignedIn] = useIsSignedIn();
 
     const handleClick = async () => {
 
         let policy = {
-            conditionalAccessPolicyJson: caPolicyJson,
+            conditionalAccessPolicyJson: "",
             isManual: false
         };
 
@@ -98,14 +111,28 @@ export const CaDocGenAuto = () => {
     return (
         <>
             <div className={styles.base}>
+                <p>Connect to your tenant and export your conditional access policies as a PowerPoint presentation.</p>
+                
                 <div className={styles.wrapper}>
-                    <Button appearance="primary" icon={<CalendarMonthRegular />}
-                        onClick={handleClick}
-                    >
-                        Generate documentation
-                    </Button>
+
+                    {isSignedIn &&
+                        <Button appearance="primary" icon={<CalendarMonthRegular />}
+                            onClick={handleClick}
+                        >
+                            Generate documentation
+                        </Button>
+                    }
+                    {!isSignedIn &&
+                        <div>
+                            <p>Please sign in to generate documentation.</p>
+                            <Login />
+                        </div>
+                    }
                 </div>
             </div>
         </>
     );
 };
+
+
+
