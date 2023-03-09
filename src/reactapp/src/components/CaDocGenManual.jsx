@@ -63,7 +63,7 @@ export const CaDocGenManual = () => {
         };
 
 
-        fetch('/weatherforecast', options)
+        fetch('/powerpoint', options)
             .then((response) => response.blob())
             .then((blob) => {
 

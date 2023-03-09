@@ -1,6 +1,6 @@
-﻿using CADocGen.PowerPointGenerator;
+using CADocGen.PowerPointGenerator;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Primitives;
 using webapi.Models;
 
 namespace webapi.Controllers;
@@ -9,6 +9,7 @@ namespace webapi.Controllers;
 [Route("[controller]")]
 public class PowerPointController : ControllerBase
 {
+
     private readonly ILogger<PowerPointController> _logger;
     private readonly IWebHostEnvironment _hostEnvironment;
 
@@ -19,21 +20,35 @@ public class PowerPointController : ControllerBase
     }
 
     [HttpPost]
-    public void Post(GeneratePowerPointManualRequest policy)
+    public async Task<IActionResult> Post(GeneratePowerPointManualRequest policy)
     {
+        
         //Collect Graph data
-        //var graphData = new GraphData();
-        //await graphData.ImportPolicy(policy.ConditionalAccessPolicyJson);
+        var graphData = new GraphData();
+        if(policy.IsManual == true)
+        {
+            await graphData.ImportPolicy(policy.ConditionalAccessPolicyJson);
+        }
+        else
+        {
+            StringValues accessToken;
+            Request.Headers.TryGetValue("X-PowerPointGeneration-Token", out accessToken);
+            await graphData.CollectData(accessToken);
+        }
 
-        ////Generate and stream doc
-        //Response.ContentType = "application/octet-stream";
-        //Response.Headers.Add("Content-Disposition", "attachment; filename=\"Conditional Access Policies.pptx\"");
 
-        //var templateFilePath = Path.Combine(_hostEnvironment.ContentRootPath, @"wwwroot\assets\PolicyTemplate.pptx");
+        Response.Clear();
+        //Generate and stream doc
+        Response.ContentType = "application/octet-stream";
+        Response.Headers.Add("Content-Disposition", "attachment; filename=\"Conditional Access Policies.pptx\"");
 
-        //var gen = new DocumentGenerator();
-        //gen.GeneratePowerPoint(graphData, templateFilePath, Response.BodyWriter.AsStream());
+        var templateFilePath = Path.Combine(_hostEnvironment.ContentRootPath, @"wwwroot\assets\PolicyTemplate.pptx");
 
-        //return new EmptyResult();
+        var gen = new DocumentGenerator();
+        var stream = new MemoryStream();
+        gen.GeneratePowerPoint(graphData, templateFilePath, stream);
+        stream.Position = 0;
+
+        return File(stream, "application/octet-stream", "cadeck.pptx");
     }
 }
