@@ -5,7 +5,6 @@ import {
     useId,
     Label,
     Textarea,
-    Button
 } from "@fluentui/react-components";
 import {
     bundleIcon,
@@ -21,6 +20,7 @@ import {
 } from "@fluentui/react-components";
 import { VSCTerminalPowershell } from '@icongo/vsc';
 import { Providers, ProviderState } from "@microsoft/mgt";
+import { CaDocGenButton } from '../components/CaDocGenButton';
 
 const useStyles = makeStyles({
     base: {
@@ -34,11 +34,6 @@ const useStyles = makeStyles({
     textarea: {
         height: "200px",
     },
-    wrapper: {
-        marginTop: tokens.spacingVerticalM,
-        columnGap: "15px",
-        display: "flex",
-    },
 });
 
 
@@ -46,48 +41,6 @@ export const CaDocGenManual = () => {
     const textareaId = useId("textarea");
     const styles = useStyles();
     const [caPolicyJson, setCaPolicyJson] = useState("");
-
-    const handleClick = async () => {
-
-        let policy = {
-            conditionalAccessPolicyJson: caPolicyJson,
-            isManual: true
-        };
-
-        const options = {
-            method: 'POST',
-            headers: {
-                'Content-type': 'application/json',
-            },
-            body: JSON.stringify(policy)
-        };
-
-
-        fetch('/powerpoint', options)
-            .then((response) => response.blob())
-            .then((blob) => {
-
-                // 2. Create blob link to download
-                const url = window.URL.createObjectURL(new Blob([blob]));
-                const link = document.createElement('a');
-                link.href = url;
-                link.setAttribute('download', `Conditional Access Policy Documentation.pptx`);
-                // 3. Append to html page
-                document.body.appendChild(link);
-                // 4. Force download
-                link.click();
-                // 5. Clean up and remove the link
-                link.parentNode.removeChild(link);
-
-            })
-            .catch((error) => {
-                error.json().then((json) => {
-                    this.setState({
-                        errors: json,
-                    });
-                })
-            });
-    };
 
     return (
         <>
@@ -110,13 +63,13 @@ export const CaDocGenManual = () => {
                         </AccordionPanel>
                     </AccordionItem>
                     <AccordionItem value="2">
-                        <AccordionHeader icon={<VSCTerminalPowershell width={16}/>}>
+                        <AccordionHeader icon={<VSCTerminalPowershell width={16} />}>
                             Graph PowerShell
                         </AccordionHeader>
                         <AccordionPanel>
                             <ul>
                                 <li>Run this command to copy the policies to the clipboard and paste into the text box below.</li>
-                                <li><small><code>Invoke-GraphRequest -Uri 'https://graph.microsoft.com/v1.0/policies/conditionalAccessPolicies' -OutputType Json | Set-Clipboard</code></small></li>
+                                <li><small><code>Invoke-GraphRequest -Uri 'https://graph.microsoft.com/beta/policies/conditionalAccessPolicies' -OutputType Json | Set-Clipboard</code></small></li>
                             </ul>
                         </AccordionPanel>
                     </AccordionItem>
@@ -131,13 +84,7 @@ export const CaDocGenManual = () => {
                     onChange={(e) => setCaPolicyJson(e.target.value)}
                 />
             </div>
-            <div className={styles.wrapper}>
-                <Button appearance="primary" icon={<CalendarMonthRegular />}
-                    onClick={handleClick}
-                >
-                    Generate documentation
-                </Button>
-            </div>
+            <CaDocGenButton isManual={true} caPolicyJson={caPolicyJson} />
         </>
     );
 };
