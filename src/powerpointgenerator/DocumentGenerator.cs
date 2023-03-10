@@ -91,11 +91,11 @@ public class DocumentGenerator
         ppt.Show(assignedCloudAppAction.AccessType == AccessType.AppsSelected && !assignedCloudAppAction.IsSelectedAppO365Only,
             Shape.IconAccessSelectedCloudApps);
         ppt.Show(assignedCloudAppAction.IsSelectedAppO365Only,
-            Shape.IconAccessOffice365);
+            Shape.IconAccessOffice365, Shape.PicAccessOffice365);
         ppt.Show(assignedCloudAppAction.AccessType == AccessType.UserActionsRegSecInfo,
-            Shape.IconAccessMySecurityInfo);
+            Shape.IconAccessMySecurityInfo, Shape.PicAccessSecurityInfo);
         ppt.Show(assignedCloudAppAction.AccessType == AccessType.UserActionsRegDevice,
-            Shape.IconAccessRegisterOrJoinDevice);
+            Shape.IconAccessRegisterOrJoinDevice, Shape.PicAccessRegisterDevice);
         ppt.Show(assignedCloudAppAction.AccessType == AccessType.AuthenticationContext,
             Shape.IconAccessAuthenticationContext);
         ppt.Show(assignedCloudAppAction.AccessType == AccessType.AppsNone,

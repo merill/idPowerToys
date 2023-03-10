@@ -86,7 +86,7 @@ export const CaDocGenButton = ({ isManual, caPolicyJson, token }) => {
                     onClick={handleClick}
                 >
                     Generate documentation
-                </Button> {showProgress && <Spinner />}
+                </Button> {showProgress && <Spinner label="Creating presenating..." size="small" />}
             </div>
             {showErrorAlert &&
                 <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "20px" }}>
