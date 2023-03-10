@@ -13,6 +13,7 @@
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.3" />
     <PackageReference Include="Microsoft.Identity.Web.MicrosoftGraphBeta" Version="2.5.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    <PackageReference Include="Syncfusion.Licensing" Version="20.4.0.53" />
     <PackageReference Include="Syncfusion.Presentation.Net.Core" Version="20.4.0.52" />
   </ItemGroup>
 
