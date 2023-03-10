@@ -2,6 +2,7 @@ import React from "react";
 import { NavBar } from "./NavBar"
 import { Login } from '@microsoft/mgt-react';
 import { Link, Outlet } from "react-router-dom";
+import { SocialIcon } from 'react-social-icons';
 
 export const PageLayout = (props) => {
     return (
@@ -10,7 +11,7 @@ export const PageLayout = (props) => {
                 <header>
 
                     <div className="logo" role="presentation" aria-hidden="true" itemProp="logo" itemScope="itemScope">
-                        <img src="/idPowerToysLogo.png" height="46"></img>
+                        <img src="/idPowerToysLogo.png" height="46" alt="Icon of woman with a pumped up arm showing a can do attitude."></img>
                     </div>
                     <div className="colorgroup"></div>
                     <div className="profile">
@@ -35,7 +36,12 @@ export const PageLayout = (props) => {
                 <footer>
                     <div className="switches">
                         <small>
-                            Brought to you by &nbsp;<a target="_blank" href="https://merill.net/">Merill</a>
+                            <SocialIcon url="https://twitter.com/merill" style={{ height: 20, width: 20 }} />&nbsp;
+                            <SocialIcon url="https://www.linkedin.com/in/merill/" style={{ height: 20, width: 20 }} />&nbsp;
+                            <SocialIcon url="https://github.com/merill" style={{ height: 20, width: 20 }} />&nbsp;
+                            
+                            Brought to you by &nbsp;<a href="https://merill.net/">Merill</a>&nbsp;
+
                         </small>
                     </div>
                     <div className="version">
@@ -43,7 +49,7 @@ export const PageLayout = (props) => {
                     <div className="copy">
                         <small>
                             <Link to="/about">About</Link>
-                            &nbsp;|&nbsp;<a target="_blank" href="https://merill.net/privacy">Privacy Policy</a>
+                            &nbsp;|&nbsp;<a target="_blank" rel="noreferrer" href="/privacy.html">Privacy Policy</a>
                         </small>
                     </div>
                 </footer>

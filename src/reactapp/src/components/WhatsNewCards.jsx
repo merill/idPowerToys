@@ -97,7 +97,7 @@ const CardExample = (props) => {
 
             <CardFooter>
                 <Button appearance="primary" icon={<SlideLayout24Filled />}
-                    onClick={() => navigate('/cadoc/Home')}
+                    onClick={() => navigate('/ca')}
                 >
                     Try it out
                 </Button>

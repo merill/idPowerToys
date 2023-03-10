@@ -55,7 +55,7 @@ export const CaDocGenManual = () => {
                         </AccordionHeader>
                         <AccordionPanel>
                             <ul>
-                                <li>Open <a target="_blank" href="https://developer.microsoft.com/en-us/graph/graph-explorer?request=policies%2FconditionalAccessPolicies&method=GET&version=beta&GraphUrl=https://graph.microsoft.com">Graph Explorer</a></li>
+                                <li>Open <a target="_blank" rel="noreferrer" href="https://developer.microsoft.com/en-us/graph/graph-explorer?request=policies%2FconditionalAccessPolicies&method=GET&version=beta&GraphUrl=https://graph.microsoft.com">Graph Explorer</a></li>
                                 <li>Run a query for <b>'https://graph.microsoft.com/beta/policies/conditionalAccessPolicies'</b></li>
                                 <li>Highlight and copy the content from the <b>Response preview</b> panel</li>
                                 <li>Paste the content below and click <b>Generate documentation</b></li>

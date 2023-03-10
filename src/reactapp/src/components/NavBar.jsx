@@ -10,10 +10,12 @@ export const NavBar = () => {
         <>
             <ul>
                 <li>
-                    <Button appearance="primary" onClick={() => navigate('/')} >Home</Button>
+                    <Button appearance="secondary" onClick={() => navigate('/')} >Home</Button>
                 </li>
+            </ul>
+            <ul className="navMenuFull">
                 <li>
-                    <Button appearance="primary" onClick={() => navigate('/cadoc/Home')} >Conditional Access Documenter</Button>
+                    <Button appearance="secondary" onClick={() => navigate('/ca')} >CA Documenter</Button>
                 </li>
             </ul>
         </>
