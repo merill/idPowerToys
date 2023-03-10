@@ -19,3 +19,7 @@ export const loginRequest = {
 export const graphConfig = {
     graphMeEndpoint: "https://graph.microsoft.com/v1.0/me"
 };
+
+export const apiConfig = {
+    powerPointEndPoint: "https://idpowertoys.azurewebsites.net"
+}

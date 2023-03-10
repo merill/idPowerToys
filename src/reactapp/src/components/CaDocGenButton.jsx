@@ -5,6 +5,7 @@ import { Providers, ProviderState } from "@microsoft/mgt";
 import { useState, useEffect } from 'react';
 import { Spinner, SpinnerProps } from "@fluentui/react-components";
 import { Alert } from "@fluentui/react-components/unstable";
+import { apiConfig } from "../authConfig"
 
 const useStyles = makeStyles({
     wrapper: {
@@ -47,7 +48,7 @@ export const CaDocGenButton = ({ isManual, caPolicyJson, token }) => {
         };
 
 
-        fetch('/powerpoint', options)
+        fetch(apiConfig.powerPointEndPoint + '/powerpoint', options)
             .then((response) => {
                 if (response.ok) {
                     return response.blob();
