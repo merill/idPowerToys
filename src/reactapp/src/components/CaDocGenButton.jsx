@@ -92,7 +92,7 @@ export const CaDocGenButton = ({ isManual, caPolicyJson, token }) => {
             {showErrorAlert &&
                 <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "20px" }}>
                     <Alert intent="error" action="Dismiss" onClick={dismissAlert}>
-                        The presentation could not be generated.
+                        Sorry something went wrong. Please try again.
                     </Alert>
                 </div>
             }
