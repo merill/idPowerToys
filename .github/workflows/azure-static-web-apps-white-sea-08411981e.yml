@@ -18,6 +18,13 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: true
+      - name: Update api endpoint
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          include: src/reactapp/src/authConfig.js
+          find: ^.*powerPointEndPoint.*$
+          replace: "    powerPointEndPoint: https://idpowertoys-ci.azurewebsites.net'"
+          regex: true
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
