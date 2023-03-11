@@ -3,6 +3,7 @@ import { NavBar } from "./NavBar"
 import { Login } from '@microsoft/mgt-react';
 import { Link, Outlet } from "react-router-dom";
 import { SocialIcon } from 'react-social-icons';
+import { envConfig } from "../authConfig"
 
 export const PageLayout = (props) => {
     return (
@@ -11,7 +12,8 @@ export const PageLayout = (props) => {
                 <header>
 
                     <div className="logo" role="presentation" aria-hidden="true" itemProp="logo" itemScope="itemScope">
-                        <img src="/idPowerToysLogo.png" height="46" alt="Icon of woman with a pumped up arm showing a can do attitude."></img>
+                        {envConfig.envName}<img src="/idPowerToysLogo.png" height="46" alt="Icon of woman with a pumped up arm showing a can do attitude."></img>
+                        
                     </div>
                     <div className="colorgroup"></div>
                     <div className="profile">

@@ -18,15 +18,21 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: true
-      - name: Update API endpoint for environment
+      - name: Update API endpoint for environment and client id
         shell: pwsh
         run: |
+          $powerPointEndPoint = 'https://idpowertoys-ci.azurewebsites.net'
+          $clientId = '50827722-4f53-48ba-ae58-db63bb53626b'
+          $envName = '[CI]'
           $configFilePath = './src/reactapp/src/authConfig.js'
           $config = Get-Content $configFilePath
-          $updatedConfig = $config -replace "^.*powerPointEndPoint.*$", "    powerPointEndPoint: 'https://idpowertoys-ci.azurewebsites.net'"
+          $updatedConfig = $config -replace "^.*powerPointEndPoint.*$", "    powerPointEndPoint: '{$powerPointEndPoint}'"
+          $updatedConfig = $config -replace "^.*clientId.*$", "    clientId: '{$clientId}'"
+          $updatedConfig = $config -replace "^.*envName.*$", "    envName: '{$envName}'"
           Set-Content -Value $updatedConfig -Path $configFilePath
           Write-Output "Updating $configFilePath to -->"
           Write-Output $updatedConfig
+
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1

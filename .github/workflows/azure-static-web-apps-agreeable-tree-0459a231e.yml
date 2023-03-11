@@ -21,9 +21,14 @@ jobs:
       - name: Update API endpoint for environment
         shell: pwsh
         run: |
+          $powerPointEndPoint = 'https://idpowertoys.azurewebsites.net'
+          $clientId = '6ce0484b-2ae6-4458-b2b9-b3369f42fd6f'
+          $envName = ''
           $configFilePath = './src/reactapp/src/authConfig.js'
           $config = Get-Content $configFilePath
-          $updatedConfig = $config -replace "^.*powerPointEndPoint.*$", "    powerPointEndPoint: 'https://idpowertoys.azurewebsites.net'"
+          $updatedConfig = $config -replace "^.*powerPointEndPoint.*$", "    powerPointEndPoint: '{$powerPointEndPoint}'"
+          $updatedConfig = $config -replace "^.*clientId.*$", "    clientId: '{$clientId}'"
+          $updatedConfig = $config -replace "^.*envName.*$", "    envName: '{$envName}'"
           Set-Content -Value $updatedConfig -Path $configFilePath
           Write-Output "Updating $configFilePath to -->"
           Write-Output $updatedConfig

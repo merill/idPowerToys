@@ -6,9 +6,10 @@ import reportWebVitals from './reportWebVitals';
 import { FluentProvider, teamsLightTheme } from "@fluentui/react-components";
 import { Providers } from '@microsoft/mgt-element';
 import { Msal2Provider } from '@microsoft/mgt-msal2-provider';
+import { msalConfig } from "./authConfig"
 
 Providers.globalProvider = new Msal2Provider({
-    clientId: '6ce0484b-2ae6-4458-b2b9-b3369f42fd6f',
+    clientId: msalConfig.clientId,
     scopes: ['Agreement.Read.All', 'CrossTenantInformation.ReadBasic.All', 'Directory.Read.All', 'Policy.Read.All', 'User.Read'],
     loginType: 'redirect',
 });
