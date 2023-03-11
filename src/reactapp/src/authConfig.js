@@ -1,11 +1,11 @@
 export const apiConfig = {
-    powerPointEndPoint: "https://idpowertoys.azurewebsites.net"
+    powerPointEndPoint: 'https://idpowertoys-ci.azurewebsites.net'
 }
 
 export const msalConfig = {
-    clientId: "4294e906-8e49-4242-8530-3aafece83dfa"
+    clientId: '50827722-4f53-48ba-ae58-db63bb53626b'
 }
 
 export const envConfig = {
-    envName: "[Dev]"
+    envName: '[CI]'
 }
