@@ -21,9 +21,9 @@ jobs:
       - name: Update api endpoint
         uses: jacobtomlinson/gha-find-replace@v3
         with:
-          include: src/reactapp/src/authConfig.js
+          include: /src/reactapp/src/authConfig.js
           find: ^.*powerPointEndPoint.*$
-          replace: "    powerPointEndPoint: https://idpowertoys-ci.azurewebsites.net'"
+          replace: "    powerPointEndPoint: 'https://idpowertoys-ci.azurewebsites.net'"
           regex: true
       - name: Build And Deploy
         id: builddeploy
