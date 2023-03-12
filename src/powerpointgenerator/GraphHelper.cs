@@ -290,21 +290,28 @@ public class GraphHelper
     {
 
         //TODO Put generic names if _configOptions.IsMaskName
-        var authContextsGraph = await _graph.IdentityGovernance.TermsOfUse.Agreements
+        var agreements = await _graph.IdentityGovernance.TermsOfUse.Agreements
                     .Request()
                     .GetAsync();
-        foreach (var ac in authContextsGraph)
+        int index = 1;
+        foreach (var ac in agreements)
         {
-            directoryObjects.Add(ac.Id, ac.DisplayName);
+            var name = _configOptions.IsMaskTermsOfUse == true
+                ? GetManualObjectName(ac.Id, index++, "Terms of use") : ac.DisplayName;
+            directoryObjects.Add(ac.Id, name);
         }
     }
     private async Task AddNamedLocations(StringDictionary directoryObjects)
     {
-        var authContextsGraph = await _graph.Identity.ConditionalAccess.NamedLocations
+        var namedLocations = await _graph.Identity.ConditionalAccess.NamedLocations
                     .Request()
                     .GetAsync();
-        foreach (var ac in authContextsGraph)
+
+        int index = 1;
+        foreach (var ac in namedLocations)
         {
+            var name = _configOptions.IsMaskNamedLocation == true
+                ? GetManualObjectName(ac.Id, index++, "Terms of use") : ac.DisplayName;
             directoryObjects.Add(ac.Id, ac.DisplayName);
         }
     }
