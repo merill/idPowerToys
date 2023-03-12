@@ -83,6 +83,7 @@ public class DocumentGenerator
         }
         
         ppt.SetText(Shape.PolicyName, policyName);
+        ppt.SetLink(Shape.PolicyName, GetPolicyPortalLink(policy));
         ppt.Show(policy.State == G.ConditionalAccessPolicyState.Enabled, Shape.StateEnabled);
         ppt.Show(policy.State == G.ConditionalAccessPolicyState.Disabled, Shape.StateDisabled);
         ppt.Show(policy.State == G.ConditionalAccessPolicyState.EnabledForReportingButNotEnforced, Shape.StateReportOnly);
@@ -162,6 +163,8 @@ public class DocumentGenerator
 
         var json = JsonSerializer.Serialize(policy, new JsonSerializerOptions { WriteIndented = true });
         var notes = slide.AddNotesSlide();
+        notes.NotesTextBody.AddParagraph(policyName);
+        notes.NotesTextBody.AddParagraph("Portal link: " + GetPolicyPortalLink(policy));
         notes.NotesTextBody.AddParagraph(json);
     }
 
@@ -186,5 +189,10 @@ public class DocumentGenerator
         }
 
         ppt.SetText(Shape.GenerationDate, DateTime.Now.ToString("dd MMM yyyy"));
+    }
+
+    private string GetPolicyPortalLink(G.ConditionalAccessPolicy policy)
+    {
+        return $"https://entra.microsoft.com/#view/Microsoft_AAD_ConditionalAccess/PolicyBlade/policyId/{policy.Id}";
     }
 }
