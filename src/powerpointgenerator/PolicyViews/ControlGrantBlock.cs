@@ -22,6 +22,7 @@ public class ControlGrantBlock : PolicyView
     public string CustomAuthenticationFactorName { get; set; }
     public string TermsOfUseName { get; set; }
     public string AuthenticationStrengthName { get; set; }
+
     public ControlGrantBlock(ConditionalAccessPolicy policy, GraphData graphData) : base(policy, graphData)
     {
         IsGrant = true; //Default to grant and only change to Block if it is explicitly set.
@@ -49,27 +50,33 @@ public class ControlGrantBlock : PolicyView
                 switch (control)
                 {
                     case ConditionalAccessGrantControl.ApprovedApplication:
+                        Name += "-Approved App";
                         ApprovedApplication = true;
                         GrantControlsCount++;
                         break;
                     case ConditionalAccessGrantControl.Block: break; //Block is already shown in header
                     case ConditionalAccessGrantControl.CompliantApplication:
+                        Name += "-Compliant App";
                         CompliantApplication = true;
                         GrantControlsCount++;
                         break;
                     case ConditionalAccessGrantControl.CompliantDevice:
+                        Name += "-Compliant Device";
                         CompliantDevice = true;
                         GrantControlsCount++; 
                         break;
                     case ConditionalAccessGrantControl.DomainJoinedDevice:
+                        Name += "-HAADJ";
                         DomainJoinedDevice = true;
                         GrantControlsCount++; 
                         break;
                     case ConditionalAccessGrantControl.Mfa:
+                        Name += "-MFA";
                         Mfa = true;
                         GrantControlsCount++; 
                         break;
                     case ConditionalAccessGrantControl.PasswordChange:
+                        Name += "-Password Change";
                         PasswordChange = true;
                         GrantControlsCount++; 
                         break;
@@ -78,6 +85,7 @@ public class ControlGrantBlock : PolicyView
         }
         if (grantControls.CustomAuthenticationFactors.Any())
         {
+            Name += "-3PMFA";
             CustomAuthenticationFactor = true;
             bool isFirst = true;
             foreach (var caf in grantControls.CustomAuthenticationFactors)
@@ -89,6 +97,7 @@ public class ControlGrantBlock : PolicyView
         }
         if (grantControls.TermsOfUse.Any())
         {
+            Name += "-ToU";
             TermsOfUse = true;
             bool isFirst = true;
             foreach (var tou in grantControls.TermsOfUse)
@@ -103,6 +112,7 @@ public class ControlGrantBlock : PolicyView
         
         if (grantControlsJson != null && grantControlsJson.authenticationStrength != null)
         {
+            Name += "-MFA Strength";
             AuthenticationStrength = true;
             AuthenticationStrengthName = $"Auth strength:{grantControlsJson.authenticationStrength.displayName}";
         }

@@ -24,16 +24,16 @@ public class PowerPointController : ControllerBase
     {
         
         //Collect Graph data
-        var graphData = new GraphData();
+        var graphData = new GraphData(configOptions);
         if(configOptions.IsManual == true)
         {
-            await graphData.ImportPolicy(configOptions);
+            await graphData.ImportPolicy();
         }
         else
         {
             StringValues accessToken;
             Request.Headers.TryGetValue("X-PowerPointGeneration-Token", out accessToken);
-            await graphData.CollectData(accessToken, configOptions);
+            await graphData.CollectData(accessToken);
         }
 
 

@@ -3,6 +3,7 @@ using Syncfusion.Presentation;
 using System.Text.Json;
 using CADocGen.PowerPointGenerator.PolicyViews;
 using IdPowerToys.PowerPointGenerator;
+using System.Text;
 
 namespace CADocGen.PowerPointGenerator;
 
@@ -45,18 +46,19 @@ public class DocumentGenerator
 
             section.Name = sectionTitle;
 
+            int index = 1;
             foreach (var policy in filteredPolicies)
             {
                 var slide = templateSlide.Clone();
 
-                SetPolicySlideInfo(slide, policy);
+                SetPolicySlideInfo(slide, policy, index++);
 
                 section.Slides.Add(slide);
             }
         }
     }
 
-    private void SetPolicySlideInfo(ISlide slide, G.ConditionalAccessPolicy policy)
+    private void SetPolicySlideInfo(ISlide slide, G.ConditionalAccessPolicy policy, int index)
     {
         var assignedUserWorkload = new AssignedUserWorkload(policy, _graphData);
         var assignedCloudAppAction = new AssignedCloudAppAction(policy, _graphData);
@@ -72,7 +74,15 @@ public class DocumentGenerator
 
         var ppt = new PowerPointHelper(slide);
 
-        ppt.SetText(Shape.PolicyName, policy.DisplayName);
+        var policyName = policy.DisplayName;
+        if (_graphData.ConfigOptions.IsMaskPolicy == true)
+        {
+            policyName = GetPolicyName(policy, index, assignedUserWorkload, assignedCloudAppAction,
+                conditionClientAppTypes, conditionDeviceFilters, conditionLocations,
+                conditionPlatforms, conditionRisks, grantControls, sessionControls);
+        }
+        
+        ppt.SetText(Shape.PolicyName, policyName);
         ppt.Show(policy.State == G.ConditionalAccessPolicyState.Enabled, Shape.StateEnabled);
         ppt.Show(policy.State == G.ConditionalAccessPolicyState.Disabled, Shape.StateDisabled);
         ppt.Show(policy.State == G.ConditionalAccessPolicyState.EnabledForReportingButNotEnforced, Shape.StateReportOnly);
@@ -153,6 +163,15 @@ public class DocumentGenerator
         var json = JsonSerializer.Serialize(policy, new JsonSerializerOptions { WriteIndented = true });
         var notes = slide.AddNotesSlide();
         notes.NotesTextBody.AddParagraph(json);
+    }
+
+    private string GetPolicyName(G.ConditionalAccessPolicy policy, int index, AssignedUserWorkload assignedUserWorkload, AssignedCloudAppAction assignedCloudAppAction, ConditionClientAppTypes conditionClientAppTypes, ConditionDeviceFilters conditionDeviceFilters, ConditionLocations conditionLocations, ConditionPlatforms conditionPlatforms, ConditionRisks conditionRisks, ControlGrantBlock grantControls, ControlSession sessionControls)
+    {
+        var sb = new StringBuilder("CA");
+        sb.Append(index.ToString("000"));
+        var grantBlock = grantControls.IsGrant ? "Grant" : "Block";
+        sb.Append($"-{assignedUserWorkload.Name}-{assignedCloudAppAction.Name}{grantControls.Name}-{grantBlock}");
+        return sb.ToString();
     }
 
     private void SetTitleSlideInfo(ISlide slide)

@@ -14,9 +14,14 @@ public class GraphData
     public StringDictionary? AuthenticationContexts { get; set; }
     public ICollection<Organization>? Organization { get; set; }
     public User? Me { get; set; }
+    public ConfigOptions ConfigOptions { get; private set; }
 
+    public GraphData(ConfigOptions configOptions)
+    {
+        ConfigOptions = configOptions;
+    }
 
-    public async Task CollectData(string accessToken, ConfigOptions configOptions)
+    public async Task CollectData(string accessToken)
     {
         var graphClient = new GraphServiceClient("https://graph.microsoft.com/beta",
             new DelegateAuthenticationProvider(async (requestMessage) =>
@@ -24,7 +29,7 @@ public class GraphData
                 requestMessage.Headers.Authorization = new AuthenticationHeaderValue("bearer", accessToken);
             }));
 
-        var graphHelper = new GraphHelper(graphClient, configOptions);
+        var graphHelper = new GraphHelper(graphClient, ConfigOptions);
 
         await CollectData(graphHelper);
     }
@@ -38,14 +43,14 @@ public class GraphData
         AuthenticationContexts = await graph.GetAuthenticationContexts();
     }
 
-    public async Task ImportPolicy(ConfigOptions configOptions)
+    public async Task ImportPolicy()
     {
-        JsonNode rootNode = JsonNode.Parse(configOptions.ConditionalAccessPolicyJson)!;
+        JsonNode rootNode = JsonNode.Parse(ConfigOptions.ConditionalAccessPolicyJson)!;
         JsonNode valueNode = rootNode!["value"]!;
         var policyJson = valueNode.ToString();
         Policies = new Serializer().DeserializeObject<List<ConditionalAccessPolicy>>(policyJson);
 
-        var graph = new GraphHelper(configOptions);
+        var graph = new GraphHelper(ConfigOptions);
         ObjectCache = await graph.GetDirectoryObjectCache(Policies);
     }
 }
