@@ -42,7 +42,7 @@ public class PowerPointController : ControllerBase
         Response.ContentType = "application/octet-stream";
         Response.Headers.Add("Content-Disposition", "attachment; filename=\"Conditional Access Policies.pptx\"");
 
-        var templateFilePath = Path.Combine(_hostEnvironment.ContentRootPath, @"wwwroot\assets\PolicyTemplate.pptx");
+        var templateFilePath = Path.Combine(_hostEnvironment.ContentRootPath, @"wwwroot/assets/PolicyTemplate.pptx");
 
         var gen = new DocumentGenerator();
         var stream = new MemoryStream();

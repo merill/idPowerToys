@@ -2,16 +2,13 @@ import {
     makeStyles,
     shorthands,
     Button,
-    Caption1,
     Body1,
-    Subtitle1,
 } from "@fluentui/react-components";
 import {
     Card,
     CardHeader,
     CardFooter,
     CardPreview,
-    CardProps,
 } from "@fluentui/react-components/unstable";
 import { useNavigate } from "react-router-dom";
 
@@ -29,14 +26,6 @@ const useStyles = makeStyles({
         rowGap: "36px",
     },
 
-    title: {
-        ...shorthands.margin(0, 0, "12px"),
-    },
-
-    description: {
-        ...shorthands.margin(0, 0, "12px"),
-    },
-
     card: {
         width: "400px",
         maxWidth: "100%",
@@ -48,27 +37,7 @@ const useStyles = makeStyles({
     },
 });
 
-const Header = ({ title, description }) => {
-    const styles = useStyles();
-
-    return (
-        <>
-            {title ? (
-                <Subtitle1 as="h4" block className={styles.title}>
-                    {title}
-                </Subtitle1>
-            ) : null}
-
-            {description ? (
-                <Body1 as="p" block className={styles.description}>
-                    {description}
-                </Body1>
-            ) : null}
-        </>
-    );
-};
-
-const CardExample = (props) => {
+const ConditionalAccessCard = (props) => {
     const styles = useStyles();
     const navigate = useNavigate();
 
@@ -112,12 +81,7 @@ export const WhatsNewCards = () => {
     return (
         <div className={styles.main}>
             <section>
-                <Header
-                    title="Welcome to idPowerToys"
-                    description="idPowerToys is a collection of mini-apps that I've been building (planning to build) that are related to Microsoft Entra, Azure Active Directory and Microsoft Graph. I hope you find them useful."
-                />
-
-                <CardExample />
+                <ConditionalAccessCard />
             </section>
         </div>
     );

@@ -13,11 +13,10 @@ export const PageLayout = (props) => {
 
                     <div className="logo" role="presentation" aria-hidden="true" itemProp="logo" itemScope="itemScope">
                         {envConfig.envName}<img src="/idPowerToysLogo.png" height="46" alt="Icon of woman with a pumped up arm showing a can do attitude."></img>
-                        
+
                     </div>
                     <div className="colorgroup"></div>
                     <div className="profile">
-                        {/* {isAuthenticated ? <SignOutButton /> : <SignInButton />} */}
                         <Login />
                     </div>
                 </header>
@@ -41,9 +40,6 @@ export const PageLayout = (props) => {
                             <SocialIcon url="https://twitter.com/merill" style={{ height: 20, width: 20 }} />&nbsp;
                             <SocialIcon url="https://www.linkedin.com/in/merill/" style={{ height: 20, width: 20 }} />&nbsp;
                             <SocialIcon url="https://github.com/merill" style={{ height: 20, width: 20 }} />&nbsp;
-                            
-                            Brought to you by &nbsp;<a href="https://merill.net/">Merill</a>&nbsp;
-
                         </small>
                     </div>
                     <div className="version">
