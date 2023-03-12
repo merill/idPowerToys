@@ -2,6 +2,7 @@
 using Syncfusion.Presentation;
 using System.Text.Json;
 using CADocGen.PowerPointGenerator.PolicyViews;
+using IdPowerToys.PowerPointGenerator;
 
 namespace CADocGen.PowerPointGenerator;
 
@@ -9,7 +10,7 @@ public class DocumentGenerator
 {
     private GraphData _graphData;
 
-    public void GeneratePowerPoint(GraphData graphData, string templateFilePath, Stream outputStream)
+    public void GeneratePowerPoint(GraphData graphData, string templateFilePath, Stream outputStream, ConfigOptions configOptions)
     {
         _graphData = graphData;
         var policies = _graphData.Policies;

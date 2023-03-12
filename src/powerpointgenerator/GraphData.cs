@@ -1,4 +1,5 @@
-﻿using Microsoft.Graph;
+﻿using IdPowerToys.PowerPointGenerator;
+using Microsoft.Graph;
 using Microsoft.Graph.CallRecords;
 using System.Collections.Specialized;
 using System.Net.Http.Headers;
@@ -15,7 +16,7 @@ public class GraphData
     public User? Me { get; set; }
 
 
-    public async Task CollectData(string accessToken)
+    public async Task CollectData(string accessToken, ConfigOptions configOptions)
     {
         var graphClient = new GraphServiceClient("https://graph.microsoft.com/beta",
             new DelegateAuthenticationProvider(async (requestMessage) =>
@@ -23,7 +24,7 @@ public class GraphData
                 requestMessage.Headers.Authorization = new AuthenticationHeaderValue("bearer", accessToken);
             }));
 
-        var graphHelper = new GraphHelper(graphClient);
+        var graphHelper = new GraphHelper(graphClient, configOptions);
 
         await CollectData(graphHelper);
     }
@@ -37,14 +38,14 @@ public class GraphData
         AuthenticationContexts = await graph.GetAuthenticationContexts();
     }
 
-    public async Task ImportPolicy(string caPolicyJson)
+    public async Task ImportPolicy(ConfigOptions configOptions)
     {
-        JsonNode rootNode = JsonNode.Parse(caPolicyJson)!;
+        JsonNode rootNode = JsonNode.Parse(configOptions.ConditionalAccessPolicyJson)!;
         JsonNode valueNode = rootNode!["value"]!;
         var policyJson = valueNode.ToString();
         Policies = new Serializer().DeserializeObject<List<ConditionalAccessPolicy>>(policyJson);
 
-        var graph = new GraphHelper();
+        var graph = new GraphHelper(configOptions);
         ObjectCache = await graph.GetDirectoryObjectCache(Policies);
     }
 }

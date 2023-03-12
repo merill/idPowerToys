@@ -3,24 +3,25 @@ using System.Collections.Specialized;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
+using IdPowerToys.PowerPointGenerator;
 
 namespace CADocGen.PowerPointGenerator;
 
 public class GraphHelper
 {
-    private bool _isManualGeneration;
+    private ConfigOptions _configOptions;
     GraphServiceClient? _graph;
     public GraphServiceClient GraphServiceClient { get { return _graph; } }
 
     /// <summary>
     /// Perform a manual generation without making Graph API calls
     /// </summary>
-    public GraphHelper()
+    public GraphHelper(ConfigOptions configOptions)
     {
-        _isManualGeneration = true;
+        _configOptions = configOptions;
     }
 
-    public GraphHelper(GraphServiceClient graphServiceClient)
+    public GraphHelper(GraphServiceClient graphServiceClient, ConfigOptions configOptions) : this(configOptions)
     {
         _graph = graphServiceClient;
     }
@@ -171,7 +172,7 @@ public class GraphHelper
         {
             if (Guid.TryParse(id, out _))
             {
-                var name = _isManualGeneration ? GetManualObjectName(id, index++, "User") : await GetUserName(id);
+                var name = _configOptions.IsManual == true || _configOptions.IsMaskUser == true ? GetManualObjectName(id, index++, "User") : await GetUserName(id);
                 directoryObjects.Add(id, name); //TODO use batch
             }
         }
@@ -180,12 +181,12 @@ public class GraphHelper
         {
             if (Guid.TryParse(id, out _))
             {
-                var name = _isManualGeneration ? GetManualObjectName(id, index++, "Group") : await GetGroupName(id);
+                var name = _configOptions.IsManual == true || _configOptions.IsMaskGroup == true ? GetManualObjectName(id, index++, "Group") : await GetGroupName(id);
                 directoryObjects.Add(id, name); //TODO use batch
             }
         }
 
-        if (_isManualGeneration)
+        if (_configOptions.IsManual == true)
         {
             foreach (var id in roleIds.Distinct())
             {
@@ -213,7 +214,8 @@ public class GraphHelper
         {
             if (Guid.TryParse(id, out _))
             {
-                var name = _isManualGeneration ? GetManualObjectName(id, index++, "Service Principal") : await GetServicePrincipalName(id);
+                var name = _configOptions.IsManual == true || _configOptions.IsMaskServicePrincipal == true
+                    ? GetManualObjectName(id, index++, "Service Principal") : await GetServicePrincipalName(id);
                 directoryObjects.Add(id, name); //TODO use batch
             }
         }
@@ -229,7 +231,8 @@ public class GraphHelper
                 }
                 else
                 {
-                    name = _isManualGeneration ? GetManualObjectName(id, index++, "App") : await GetApplicationName(id);
+                    name = _configOptions.IsManual == true || _configOptions.IsMaskApplication == true
+                        ? GetManualObjectName(id, index++, "App") : await GetApplicationName(id);
                 }
                 directoryObjects.Add(id, name); //TODO use batch
             }
@@ -240,12 +243,13 @@ public class GraphHelper
         {
             if (Guid.TryParse(id, out _))
             {
-                var name = _isManualGeneration ? GetManualObjectName(id, index++, "Tenant") : await GetTenantName(id);
+                var name = _configOptions.IsManual == true || _configOptions.IsMaskTenant == true
+                    ? GetManualObjectName(id, index++, "Tenant") : await GetTenantName(id);
                 directoryObjects.Add(id, name); //TODO use batch
             }
         }
 
-        if (!_isManualGeneration)
+        if (_configOptions.IsManual == false)
         {
             await AddAgreements(directoryObjects);
             await AddNamedLocations(directoryObjects);
@@ -284,6 +288,8 @@ public class GraphHelper
 
     private async Task AddAgreements(StringDictionary directoryObjects)
     {
+
+        //TODO Put generic names if _configOptions.IsMaskName
         var authContextsGraph = await _graph.IdentityGovernance.TermsOfUse.Agreements
                     .Request()
                     .GetAsync();

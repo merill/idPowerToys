@@ -15,7 +15,7 @@ const useStyles = makeStyles({
     },
 });
 
-export const CaDocGenButton = ({ isManual, caPolicyJson, isMaskPolicy, isMaskGroup, isMaskUser }) => {
+export const CaDocGenButton = ({ isManual, caPolicyJson, isMaskPolicy, isMaskGroup, isMaskUser, isMaskServicePrincipal, isMaskApplication, isMaskTenant, isMaskTermsOfUse, isMaskNamedLocation }) => {
     const styles = useStyles();
     const [showProgress, setShowProgress] = useState(false);
     const [showErrorAlert, setShowErrorAlert] = useState(false);
@@ -33,7 +33,13 @@ export const CaDocGenButton = ({ isManual, caPolicyJson, isMaskPolicy, isMaskGro
             isManual: isManual,
             isMaskPolicy: isMaskPolicy,
             isMaskGroup: isMaskGroup,
-            isMaskUser: isMaskUser
+            isMaskUser: isMaskUser,
+            isMaskServicePrincipal: isMaskServicePrincipal,
+            isMaskApplication: isMaskApplication,
+            isMaskTenant: isMaskTenant,
+            isMaskTermsOfUse: isMaskTermsOfUse,
+            isMaskNamedLocation: isMaskNamedLocation
+
         };
 
         let token = "";

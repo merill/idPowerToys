@@ -57,16 +57,20 @@ export const CaDocGenAuto = () => {
     const [isMaskPolicy, setIsMaskPolicy] = React.useState(false);
     const [isMaskGroup, setIsMaskGroup] = React.useState(false);
     const [isMaskUser, setIsMaskUser] = React.useState(false);
+    const [isMaskServicePrincipal, setIsMaskServicePrincipal] = React.useState(false);
+    const [isMaskApplication, setIsMaskApplication] = React.useState(false);
+    const [isMaskTenant, setIsMaskTenant] = React.useState(false);
+    const [isMaskTermsOfUse, setIsMaskTermsOfUse] = React.useState(false);
+    const [isMaskNamedLocation, setIsMaskNamedLocation] = React.useState(false);
 
-    const onChangeMaskPolicy = React.useCallback((ev) => {
-        setIsMaskPolicy(ev.currentTarget.checked);
-    }, [setIsMaskPolicy]);
-    const onChangeMaskGroup = React.useCallback((ev) => {
-        setIsMaskGroup(ev.currentTarget.checked);
-    }, [setIsMaskGroup]);
-    const onChangeMaskUser = React.useCallback((ev) => {
-        setIsMaskUser(ev.currentTarget.checked);
-    }, [setIsMaskUser]);
+    const onChangeMaskPolicy = React.useCallback((ev) => { setIsMaskPolicy(ev.currentTarget.checked); }, [setIsMaskPolicy]);
+    const onChangeMaskGroup = React.useCallback((ev) => { setIsMaskGroup(ev.currentTarget.checked); }, [setIsMaskGroup]);
+    const onChangeMaskUser = React.useCallback((ev) => { setIsMaskUser(ev.currentTarget.checked); }, [setIsMaskUser]);
+    const onChangeMaskServicePrincipal = React.useCallback((ev) => { setIsMaskServicePrincipal(ev.currentTarget.checked); }, [setIsMaskServicePrincipal]);
+    const onChangeMaskApplication = React.useCallback((ev) => { setIsMaskApplication(ev.currentTarget.checked); }, [setIsMaskApplication]);
+    const onChangeMaskTenant = React.useCallback((ev) => { setIsMaskTenant(ev.currentTarget.checked); }, [setIsMaskTenant]);
+    const onChangeMaskTermsOfUse = React.useCallback((ev) => { setIsMaskTermsOfUse(ev.currentTarget.checked); }, [setIsMaskTermsOfUse]);
+    const onChangeMaskNamedLocation = React.useCallback((ev) => { setIsMaskNamedLocation(ev.currentTarget.checked); }, [setIsMaskNamedLocation]);    
 
     return (
         <>
@@ -82,13 +86,20 @@ export const CaDocGenAuto = () => {
                             <Switch onChange={onChangeMaskPolicy} label={"Mask policy names"} /><br />
                             <Switch onChange={onChangeMaskGroup} label={"Mask group names"} /><br />
                             <Switch onChange={onChangeMaskUser} label={"Mask user names"} /><br />
+                            <Switch onChange={onChangeMaskServicePrincipal} label={"Mask service principal names"} /><br />
+                            <Switch onChange={onChangeMaskApplication} label={"Mask applications names"} /><br />
+                            <Switch onChange={onChangeMaskTenant} label={"Mask tenant names"} /><br />
+                            <Switch onChange={onChangeMaskTermsOfUse} label={"Mask terms of use names"} /><br />
+                            <Switch onChange={onChangeMaskNamedLocation} label={"Mask named locations names"} /><br />
                         </AccordionPanel>
                     </AccordionItem>
                 </Accordion>
 
                 {isSignedIn &&
                     <>
-                        <CaDocGenButton isMaskPolicy={isMaskPolicy} isMaskGroup={isMaskGroup} isMaskUser={isMaskUser}/>
+                        <CaDocGenButton isMaskPolicy={isMaskPolicy} isMaskGroup={isMaskGroup} isMaskUser={isMaskUser} 
+                        isMaskServicePrincipal={isMaskServicePrincipal} isMaskApplication={isMaskApplication} isMaskTenant={isMaskTenant} 
+                        isMaskTermsOfUse={isMaskTermsOfUse} isMaskNamedLocation={isMaskNamedLocation} />
                     </>
                 }
 

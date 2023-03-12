@@ -1,7 +1,7 @@
 using CADocGen.PowerPointGenerator;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
-using webapi.Models;
+using IdPowerToys.PowerPointGenerator;
 
 namespace webapi.Controllers;
 
@@ -20,20 +20,20 @@ public class PowerPointController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Post(GeneratePowerPointManualRequest policy)
+    public async Task<IActionResult> Post(ConfigOptions configOptions)
     {
         
         //Collect Graph data
         var graphData = new GraphData();
-        if(policy.IsManual == true)
+        if(configOptions.IsManual == true)
         {
-            await graphData.ImportPolicy(policy.ConditionalAccessPolicyJson);
+            await graphData.ImportPolicy(configOptions);
         }
         else
         {
             StringValues accessToken;
             Request.Headers.TryGetValue("X-PowerPointGeneration-Token", out accessToken);
-            await graphData.CollectData(accessToken);
+            await graphData.CollectData(accessToken, configOptions);
         }
 
 
@@ -46,7 +46,7 @@ public class PowerPointController : ControllerBase
 
         var gen = new DocumentGenerator();
         var stream = new MemoryStream();
-        gen.GeneratePowerPoint(graphData, templateFilePath, stream);
+        gen.GeneratePowerPoint(graphData, templateFilePath, stream, configOptions);
         stream.Position = 0;
 
         return File(stream, "application/octet-stream", "cadeck.pptx");
