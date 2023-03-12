@@ -2,8 +2,8 @@ import { makeStyles, tokens, Button } from "@fluentui/react-components";
 import * as React from "react";
 import { CalendarMonthRegular, } from "@fluentui/react-icons";
 import { Providers, ProviderState } from "@microsoft/mgt";
-import { useState, useEffect } from 'react';
-import { Spinner, SpinnerProps } from "@fluentui/react-components";
+import { useState } from 'react';
+import { Spinner } from "@fluentui/react-components";
 import { Alert } from "@fluentui/react-components/unstable";
 import { apiConfig } from "../authConfig"
 
@@ -15,7 +15,7 @@ const useStyles = makeStyles({
     },
 });
 
-export const CaDocGenButton = ({ isManual, caPolicyJson, token }) => {
+export const CaDocGenButton = ({ isManual, caPolicyJson, isMaskPolicy, isMaskGroup, isMaskUser }) => {
     const styles = useStyles();
     const [showProgress, setShowProgress] = useState(false);
     const [showErrorAlert, setShowErrorAlert] = useState(false);
@@ -30,7 +30,10 @@ export const CaDocGenButton = ({ isManual, caPolicyJson, token }) => {
 
         let policy = {
             conditionalAccessPolicyJson: caPolicyJson,
-            isManual: isManual
+            isManual: isManual,
+            isMaskPolicy: isMaskPolicy,
+            isMaskGroup: isMaskGroup,
+            isMaskUser: isMaskUser
         };
 
         let token = "";
@@ -77,7 +80,7 @@ export const CaDocGenButton = ({ isManual, caPolicyJson, token }) => {
             .catch((error) => {
                 setShowErrorAlert(true);
                 setShowProgress(false);
-            });        
+            });
     };
 
     return (

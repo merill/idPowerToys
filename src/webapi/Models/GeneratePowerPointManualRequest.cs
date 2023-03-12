@@ -2,7 +2,7 @@
 {
     public class GeneratePowerPointManualRequest
     {
-        public string ConditionalAccessPolicyJson { get; set; }
+        public string? ConditionalAccessPolicyJson { get; set; }
         public bool? IsManual { get; set; }
     }
 }

@@ -60,13 +60,13 @@ export const CaDocGenAuto = () => {
 
     const onChangeMaskPolicy = React.useCallback((ev) => {
         setIsMaskPolicy(ev.currentTarget.checked);
-    }, [setIsMaskPolicy] );
+    }, [setIsMaskPolicy]);
     const onChangeMaskGroup = React.useCallback((ev) => {
         setIsMaskGroup(ev.currentTarget.checked);
-    }, [setIsMaskGroup] );
+    }, [setIsMaskGroup]);
     const onChangeMaskUser = React.useCallback((ev) => {
         setIsMaskUser(ev.currentTarget.checked);
-    }, [setIsMaskUser] );
+    }, [setIsMaskUser]);
 
     return (
         <>
@@ -75,19 +75,21 @@ export const CaDocGenAuto = () => {
                 <Accordion collapsible={true}>
                     <AccordionItem value="1">
                         <AccordionHeader icon={<OptionsRegular />}>
-                            Generation options
+                            Settings
                         </AccordionHeader>
                         <AccordionPanel>
                             <p>Use the option below to remove confidential information from the generated presentation.</p>
-                            <Switch onChange={onChangeMaskPolicy} label={"Mask policy names"} /><br/>
-                            <Switch onChange={onChangeMaskGroup} label={"Mask group names"} /><br/>
-                            <Switch onChange={onChangeMaskUser} label={"Mask user names"} /><br/>
+                            <Switch onChange={onChangeMaskPolicy} label={"Mask policy names"} /><br />
+                            <Switch onChange={onChangeMaskGroup} label={"Mask group names"} /><br />
+                            <Switch onChange={onChangeMaskUser} label={"Mask user names"} /><br />
                         </AccordionPanel>
                     </AccordionItem>
                 </Accordion>
 
                 {isSignedIn &&
-                    <CaDocGenButton isManual={false} caPolicyJson={""} />
+                    <>
+                        <CaDocGenButton isMaskPolicy={isMaskPolicy} isMaskGroup={isMaskGroup} isMaskUser={isMaskUser}/>
+                    </>
                 }
 
                 {!isSignedIn &&

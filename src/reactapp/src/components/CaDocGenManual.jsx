@@ -7,8 +7,6 @@ import {
     Textarea,
 } from "@fluentui/react-components";
 import {
-    bundleIcon,
-    CalendarMonthFilled,
     CalendarMonthRegular,
 } from "@fluentui/react-icons";
 import { useState } from 'react';
@@ -19,7 +17,6 @@ import {
     AccordionPanel,
 } from "@fluentui/react-components";
 import { VSCTerminalPowershell } from '@icongo/vsc';
-import { Providers, ProviderState } from "@microsoft/mgt";
 import { CaDocGenButton } from '../components/CaDocGenButton';
 
 const useStyles = makeStyles({
@@ -48,7 +45,7 @@ export const CaDocGenManual = () => {
                 <p>Use one of the options below to manually generate the documentation without signing into idPowerToys.</p>
                 <p>Documentation generated manually will not include the names of users, apps and other directory objects.</p>
 
-                <Accordion>
+                <Accordion collapsible={true}>
                     <AccordionItem value="1">
                         <AccordionHeader icon={<CalendarMonthRegular />}>
                             Graph Explorer
