@@ -10,11 +10,11 @@ function Home() {
     return (
         <div className={styles.container}>
             <Title1 as="h1" block>About idPowerToys</Title1>
-            <p>idPowerToys is a community project and is not an official Microsoft product or service. We are publishing it under the terms of the <a href="https://github.com/merill/IdPowerToys/blob/main/LICENSE">MIT license.</a></p>
+            <p>idPowerToys is a community project by the Microsoft Identity CxP project, however this is not an official Microsoft product or service. We are publishing it under the terms of the <a href="https://github.com/merill/IdPowerToys/blob/main/LICENSE">MIT license.</a></p>
 
             <Subtitle1 as="h2" block>Feedback and support</Subtitle1>
             <p>Please share feedback on <a href="https://twitter.com/merill">Twitter</a> and report issues on <a href="https://github.com/merill/idPowerToys/issues">GitHub</a>.</p>
-            <p>As this is a community project, support if provided on a best efforts basis.</p>
+            <p>As this is a community project, support is provided on a best efforts basis.</p>
 
             <Subtitle1 as="h2" block>Credits</Subtitle1>
             <ul>
