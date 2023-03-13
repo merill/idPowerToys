@@ -11,6 +11,7 @@ public class ControlSession : PolicyView
     public bool PersistentBrowserSession { get; set; }
     public bool ContinousAccessEvaluation { get; set; }
     public bool DisableResilienceDefaults { get; set; }
+    public bool SecureSignInSession { get; set; }
     public string SignInFrequencyIntervalLabel { get; set; }
     public string CloudAppSecurityType { get; set; }
     public string PersistentBrowserSessionModeLabel { get; set; }
@@ -76,11 +77,18 @@ public class ControlSession : PolicyView
             switch (cae.Mode)
             {
                 case ContinuousAccessEvaluationMode.Disabled: ContinousAccessEvaluationModeLabel = "Disabled"; break;
-                case ContinuousAccessEvaluationMode.StrictEnforcement: ContinousAccessEvaluationModeLabel = "Never"; break;
+                case ContinuousAccessEvaluationMode.StrictEnforcement: ContinousAccessEvaluationModeLabel = "Strictly enforce location policies"; break;
             }
         }
 
         var disableResilienceDefaults = Policy.SessionControls.DisableResilienceDefaults;
         DisableResilienceDefaults = disableResilienceDefaults != null && disableResilienceDefaults.HasValue && disableResilienceDefaults.Value;
+
+        var sessionControlsJson = Helper.GetSessionControlsJson(Policy.SessionControls);
+
+        if (sessionControlsJson != null && sessionControlsJson.secureSignInSession != null && sessionControlsJson.secureSignInSession.isEnabled)
+        {
+            SecureSignInSession = true;
+        }
     }
 }

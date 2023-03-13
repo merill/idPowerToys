@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Identity.Web.MicrosoftGraphBeta" Version="2.5.0" />
-    <PackageReference Include="Syncfusion.Presentation.Net.Core" Version="20.4.0.52" />
+    <PackageReference Include="Syncfusion.Presentation.Net.Core" Version="20.4.0.53" />
   </ItemGroup>
 
 </Project>

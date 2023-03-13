@@ -159,7 +159,13 @@ public class DocumentGenerator
         ppt.Show(!sessionControls.PersistentBrowserSession, Shape.ShadeSessionPersistentBrowser);
         ppt.SetText(Shape.SessionPersistenBrowserMode, sessionControls.PersistentBrowserSessionModeLabel);
         ppt.Show(!sessionControls.ContinousAccessEvaluation, Shape.ShadeSessionCae);
+        if (sessionControls.ContinousAccessEvaluation)
+        {
+            ppt.SetText(Shape.SessionCaeMode, sessionControls.ContinousAccessEvaluationModeLabel);
+            ppt.Show(policy.SessionControls.ContinuousAccessEvaluation.Mode == G.ContinuousAccessEvaluationMode.Disabled, Shape.IconSessionCaeDisable);
+        }
         ppt.Show(!sessionControls.DisableResilienceDefaults, Shape.ShadeSessionDisableResilience);
+        ppt.Show(!sessionControls.SecureSignInSession, Shape.ShadeSessionSecureSignIn);
 
         var json = JsonSerializer.Serialize(policy, new JsonSerializerOptions { WriteIndented = true });
         var notes = slide.AddNotesSlide();

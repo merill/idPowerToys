@@ -81,6 +81,13 @@ public static class Helper
         var applications = JsonSerializer.Deserialize<Applications>(conditionsJson);
         return applications;
     }
+
+    public static SessionControls GetSessionControlsJson(ConditionalAccessSessionControls caSessionControls)
+    {
+        var sessionControlsJson = JsonSerializer.Serialize(caSessionControls, new JsonSerializerOptions { WriteIndented = true });
+        var sessionControls = JsonSerializer.Deserialize<SessionControls>(sessionControlsJson);
+        return sessionControls;
+    }
 }
 
 //TODO: Remove these once these are supported in the Graph C# SDK
@@ -129,3 +136,13 @@ public record ApplicationFilter(
 public record Applications(
     [property: JsonPropertyName("applicationFilter")] ApplicationFilter applicationFilter
 );
+
+// Root myDeserializedClass = JsonSerializer.Deserialize<Root>(myJsonResponse);
+public record SessionControls(
+    [property: JsonPropertyName("secureSignInSession")] SecureSignInSession secureSignInSession
+);
+
+public record SecureSignInSession(
+    [property: JsonPropertyName("isEnabled")] bool isEnabled
+);
+
