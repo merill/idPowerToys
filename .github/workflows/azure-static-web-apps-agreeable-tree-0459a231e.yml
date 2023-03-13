@@ -28,7 +28,7 @@ jobs:
           $config = Get-Content $configFilePath
           $updatedConfig = $config -replace "^.*powerPointEndPoint.*$", "    powerPointEndPoint: '{$powerPointEndPoint}'"
           $updatedConfig = $config -replace "^.*clientId.*$", "    clientId: '{$clientId}'"
-          $updatedConfig = $config -replace "^.*envName.*$", "    envName: '{$envName}'"
+          $updatedConfig = $config -replace "^.*envName.*$", "    envName: '$envName'"
           Set-Content -Value $updatedConfig -Path $configFilePath
           Write-Output "Updating $configFilePath to -->"
           Write-Output $updatedConfig
