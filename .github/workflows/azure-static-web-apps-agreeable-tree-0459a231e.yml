@@ -26,12 +26,12 @@ jobs:
           $envName = ''
           $configFilePath = './src/reactapp/src/authConfig.js'
           $config = Get-Content $configFilePath
-          $updatedConfig = $config -replace "^.*powerPointEndPoint.*$", "    powerPointEndPoint: '{$powerPointEndPoint}'"
-          $updatedConfig = $config -replace "^.*clientId.*$", "    clientId: '{$clientId}'"
-          $updatedConfig = $config -replace "^.*envName.*$", "    envName: '$envName'"
-          Set-Content -Value $updatedConfig -Path $configFilePath
+          $config = $config -replace "^.*powerPointEndPoint.*$", "    powerPointEndPoint: '$powerPointEndPoint'"
+          $config = $config -replace "^.*clientId.*$", "    clientId: '$clientId'"
+          $config = $config -replace "^.*envName.*$", "    envName: '$envName'"
+          Set-Content -Value $config -Path $configFilePath
           Write-Output "Updating $configFilePath to -->"
-          Write-Output $updatedConfig
+          Write-Output $config
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
