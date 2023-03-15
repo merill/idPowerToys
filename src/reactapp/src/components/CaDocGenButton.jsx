@@ -15,7 +15,7 @@ const useStyles = makeStyles({
     },
 });
 
-export const CaDocGenButton = ({ isManual, caPolicyJson, isMaskPolicy, isMaskGroup, isMaskUser, isMaskServicePrincipal, isMaskApplication, isMaskTenant, isMaskTermsOfUse, isMaskNamedLocation }) => {
+export const CaDocGenButton = ({ isManual, caPolicyJson, maskOptions, isMaskPolicy, isMaskGroup, isMaskUser, isMaskServicePrincipal, isMaskApplication, isMaskTenant, isMaskTermsOfUse, isMaskNamedLocation }) => {
     const styles = useStyles();
     const [showProgress, setShowProgress] = useState(false);
     const [showErrorAlert, setShowErrorAlert] = useState(false);
@@ -31,14 +31,14 @@ export const CaDocGenButton = ({ isManual, caPolicyJson, isMaskPolicy, isMaskGro
         let policy = {
             conditionalAccessPolicyJson: caPolicyJson,
             isManual: isManual,
-            isMaskPolicy: isMaskPolicy,
-            isMaskGroup: isMaskGroup,
-            isMaskUser: isMaskUser,
-            isMaskServicePrincipal: isMaskServicePrincipal,
-            isMaskApplication: isMaskApplication,
-            isMaskTenant: isMaskTenant,
-            isMaskTermsOfUse: isMaskTermsOfUse,
-            isMaskNamedLocation: isMaskNamedLocation,
+            isMaskPolicy: maskOptions.includes("Policy name"),
+            isMaskGroup: maskOptions.includes("Group"),
+            isMaskUser: maskOptions.includes("User"),
+            isMaskServicePrincipal: maskOptions.includes("Service principal"),
+            isMaskApplication: maskOptions.includes("Application"),
+            isMaskTenant: maskOptions.includes("External tenant"),
+            isMaskTermsOfUse: maskOptions.includes("Terms of use"),
+            isMaskNamedLocation: maskOptions.includes("Named location"),
             groupSlidesByState: false
         };
 

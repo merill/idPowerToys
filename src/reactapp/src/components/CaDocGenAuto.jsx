@@ -10,7 +10,7 @@ import { Login } from '@microsoft/mgt-react';
 import { CaDocGenButton } from '../components/CaDocGenButton';
 import { Alert } from "@fluentui/react-components/unstable";
 import { OptionsRegular, } from "@fluentui/react-icons";
-import { Accordion, AccordionHeader, AccordionItem, AccordionPanel, Checkbox } from "@fluentui/react-components";
+import { Accordion, AccordionHeader, AccordionItem, AccordionPanel, Checkbox, useId, Combobox, Option, ComboboxProps, shorthands, typographyStyles } from "@fluentui/react-components";
 
 const useStyles = makeStyles({
     base: {
@@ -29,6 +29,18 @@ const useStyles = makeStyles({
         columnGap: "15px",
         display: "flex",
     },
+    settingsForm: {
+        // Stack the label above the field with a gap
+        display: "grid",
+        gridTemplateRows: "repeat(1fr)",
+        justifyItems: "start",
+        ...shorthands.gap("2px"),
+        //maxWidth: "400px",
+      },
+      description: {
+        ...typographyStyles.caption1,
+      },
+    
 });
 
 function useIsSignedIn(): [boolean] {
@@ -51,17 +63,20 @@ function useIsSignedIn(): [boolean] {
     return [isSignedIn];
 }
 
-export const CaDocGenAuto = () => {
+export const CaDocGenAuto = (props: Partial<ComboboxProps>) => {
     const styles = useStyles();
     const [isSignedIn] = useIsSignedIn();
-    const [isMaskPolicy, setIsMaskPolicy] = React.useState(false);
-    const [isMaskGroup, setIsMaskGroup] = React.useState(false);
-    const [isMaskUser, setIsMaskUser] = React.useState(false);
-    const [isMaskServicePrincipal, setIsMaskServicePrincipal] = React.useState(false);
-    const [isMaskApplication, setIsMaskApplication] = React.useState(false);
-    const [isMaskTenant, setIsMaskTenant] = React.useState(false);
-    const [isMaskTermsOfUse, setIsMaskTermsOfUse] = React.useState(false);
-    const [isMaskNamedLocation, setIsMaskNamedLocation] = React.useState(false);
+
+    const comboId = useId("combo-multi");
+    const selectedListId = `${comboId}-selection`;
+    const [selectedOptions, setSelectedOptions] = React.useState([]);
+    const options = ["Policy name", "Group", "User", "Service principal", "Application", "External tenant", "Terms of use", "Named location"];
+    const onSelect: ComboboxProps["onOptionSelect"] = (event, data) => {
+        setSelectedOptions(data.selectedOptions);
+      };
+    const labelledBy = selectedOptions.length > 0 ? `${comboId} ${selectedListId}` : comboId;
+    const [removeSlideGrouping, setRemoveSlideGrouping] = React.useState();
+
 
     return (
         <>
@@ -73,44 +88,28 @@ export const CaDocGenAuto = () => {
                             Settings
                         </AccordionHeader>
                         <AccordionPanel>
-                            <p>Use the option below to remove confidential information from the generated presentation.</p>
-                            <Checkbox
-        checked={
-            isMaskPolicy && isMaskGroup && isMaskUser && isMaskServicePrincipal && isMaskApplication && isMaskTenant && isMaskTermsOfUse && isMaskNamedLocation
-            ? true
-            : !(isMaskPolicy || isMaskGroup || isMaskUser || isMaskServicePrincipal || isMaskApplication || isMaskTenant || isMaskTermsOfUse || isMaskNamedLocation)
-            ? false
-            : "mixed"
-        }
-        onChange={(_ev, data) => {
-            setIsMaskPolicy(!!data.checked);
-            setIsMaskGroup(!!data.checked);
-            setIsMaskUser(!!data.checked);
-            setIsMaskServicePrincipal(!!data.checked);
-            setIsMaskApplication(!!data.checked);
-            setIsMaskTenant(!!data.checked);
-            setIsMaskTermsOfUse(!!data.checked);
-            setIsMaskNamedLocation(!!data.checked);
-        }}
-        label="Select all"
-      /><br />
-                            <Checkbox checked={isMaskPolicy} onChange={() => setIsMaskPolicy((checked) => !checked)} label={"Mask policy names"} /><br />
-                            <Checkbox checked={isMaskGroup} onChange={() => setIsMaskGroup((checked) => !checked)} label={"Mask group names"} /><br />
-                            <Checkbox checked={isMaskUser} onChange={() => setIsMaskUser((checked) => !checked)} label={"Mask user names"} /><br />
-                            <Checkbox checked={isMaskServicePrincipal} onChange={() => setIsMaskServicePrincipal((checked) => !checked)} label={"Mask service principal names"} /><br />
-                            <Checkbox checked={isMaskApplication} onChange={() => setIsMaskApplication((checked) => !checked)} label={"Mask applications names"} /><br />
-                            <Checkbox checked={isMaskTenant} onChange={() => setIsMaskTenant((checked) => !checked)} label={"Mask tenant names"} /><br />
-                            <Checkbox checked={isMaskTermsOfUse} onChange={() => setIsMaskTermsOfUse((checked) => !checked)} label={"Mask terms of use names"} /><br />
-                            <Checkbox checked={isMaskNamedLocation} onChange={() => setIsMaskNamedLocation((checked) => !checked)} label={"Mask named locations names"} /><br />
+                            <div className={styles.settingsForm}>
+                                <Checkbox
+                                    checked={removeSlideGrouping}
+                                    onChange={(ev, data) => setRemoveSlideGrouping(data.checked)}
+                                    label="Don't group slides"
+                                    /><br/>
+                                <label id={comboId}>Hide confidential information</label>
+                                <Combobox aria-labelledby={labelledBy} multiselect={true} placeholder="Select names to hide" onOptionSelect={onSelect} {...props} >
+                                    {options.map((option) => (
+                                    <Option key={option}>
+                                        {option}
+                                    </Option>
+                                    ))}
+                                </Combobox><br/>
+                            </div>
                         </AccordionPanel>
                     </AccordionItem>
                 </Accordion>
 
                 {isSignedIn &&
                     <>
-                        <CaDocGenButton isMaskPolicy={isMaskPolicy} isMaskGroup={isMaskGroup} isMaskUser={isMaskUser} 
-                        isMaskServicePrincipal={isMaskServicePrincipal} isMaskApplication={isMaskApplication} isMaskTenant={isMaskTenant} 
-                        isMaskTermsOfUse={isMaskTermsOfUse} isMaskNamedLocation={isMaskNamedLocation} />
+                        <CaDocGenButton maskOptions={selectedOptions} groupSlidesByState={!setRemoveSlideGrouping}/>
                     </>
                 }
 
