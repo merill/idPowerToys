@@ -13,5 +13,6 @@ namespace IdPowerToys.PowerPointGenerator
         public bool? IsMaskTenant { get; set; }
         public bool? IsMaskTermsOfUse { get; set; }
         public bool? IsMaskNamedLocation { get; set; }
+        public bool? GroupSlidesByState { get; set; }
     }
 }

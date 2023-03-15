@@ -21,23 +21,33 @@ public class DocumentGenerator
         SetTitleSlideInfo(pptxDoc.Slides[0]);
         var templateSlide = pptxDoc.Slides[1];
 
-        var enabledPolicies = from p in policies where p.State == G.ConditionalAccessPolicyState.Enabled select p;
-        var disabledPolicies = from p in policies where p.State == G.ConditionalAccessPolicyState.Disabled select p;
-        var reportOnlyPolicies = from p in policies where p.State == G.ConditionalAccessPolicyState.EnabledForReportingButNotEnforced select p;
+        if (configOptions.GroupSlidesByState == true)
+        {
 
-        AddSlides(pptxDoc, policies, "Enabled Policies", G.ConditionalAccessPolicyState.Enabled);
-        AddSlides(pptxDoc, policies, "Report-only Policies", G.ConditionalAccessPolicyState.EnabledForReportingButNotEnforced);
-        AddSlides(pptxDoc, policies, "Disabled Policies", G.ConditionalAccessPolicyState.Disabled);
+            var enabledPolicies = from p in policies where p.State == G.ConditionalAccessPolicyState.Enabled select p;
+            var disabledPolicies = from p in policies where p.State == G.ConditionalAccessPolicyState.Disabled select p;
+            var reportOnlyPolicies = from p in policies where p.State == G.ConditionalAccessPolicyState.EnabledForReportingButNotEnforced select p;
 
+            AddSlides(pptxDoc, policies, "Enabled Policies", G.ConditionalAccessPolicyState.Enabled);
+            AddSlides(pptxDoc, policies, "Report-only Policies", G.ConditionalAccessPolicyState.EnabledForReportingButNotEnforced);
+            AddSlides(pptxDoc, policies, "Disabled Policies", G.ConditionalAccessPolicyState.Disabled);
+        }
+        else
+        {
+            AddSlides(pptxDoc, policies, "Policies", null);
+        }
         pptxDoc.Slides.Remove(templateSlide);
         pptxDoc.Save(outputStream);
 
         pptxDoc.Close();
     }
 
-    private void AddSlides(IPresentation pptxDoc, IEnumerable<G.ConditionalAccessPolicy> policies, string sectionTitle, G.ConditionalAccessPolicyState? policyState)
+    private void AddSlides(IPresentation pptxDoc, IEnumerable<G.ConditionalAccessPolicy> policies, string? sectionTitle, G.ConditionalAccessPolicyState? policyState)
     {
-        var filteredPolicies = from p in policies where p.State == policyState select p;
+        var filteredPolicies = policyState == null
+            ? from p in policies orderby p.DisplayName select p
+            : from p in policies where p.State == policyState orderby p.DisplayName select p;
+
         var templateSlide = pptxDoc.Slides[1];
 
         if (filteredPolicies.Count() > 0)
@@ -81,12 +91,14 @@ public class DocumentGenerator
                 conditionClientAppTypes, conditionDeviceFilters, conditionLocations,
                 conditionPlatforms, conditionRisks, grantControls, sessionControls);
         }
-        
+
         ppt.SetText(Shape.PolicyName, policyName);
         ppt.SetLink(Shape.PolicyName, GetPolicyPortalLink(policy));
         ppt.Show(policy.State == G.ConditionalAccessPolicyState.Enabled, Shape.StateEnabled);
         ppt.Show(policy.State == G.ConditionalAccessPolicyState.Disabled, Shape.StateDisabled);
         ppt.Show(policy.State == G.ConditionalAccessPolicyState.EnabledForReportingButNotEnforced, Shape.StateReportOnly);
+        string lastModified = GetLastModified(policy);
+        ppt.SetText(Shape.LastModified, lastModified);
 
         ppt.SetText(Shape.UserWorkload, assignedUserWorkload.Name);
         ppt.SetText(Shape.UserWorkloadIncExc, assignedUserWorkload.IncludeExclude);
@@ -172,6 +184,16 @@ public class DocumentGenerator
         notes.NotesTextBody.AddParagraph(policyName);
         notes.NotesTextBody.AddParagraph("Portal link: " + GetPolicyPortalLink(policy));
         notes.NotesTextBody.AddParagraph(json);
+    }
+
+    private static string GetLastModified(G.ConditionalAccessPolicy policy)
+    {
+        const string dateLabel = "Last modified: ";
+        const string dateFormat = "yyyy-MM-dd";
+        string dateValue = policy.ModifiedDateTime.HasValue ? dateLabel + policy.ModifiedDateTime.Value.ToString(dateFormat) :
+            policy.CreatedDateTime.HasValue ? dateLabel + policy.CreatedDateTime.Value.ToString(dateFormat) : string.Empty;
+
+        return dateValue;
     }
 
     private string GetPolicyName(G.ConditionalAccessPolicy policy, int index, AssignedUserWorkload assignedUserWorkload, AssignedCloudAppAction assignedCloudAppAction, ConditionClientAppTypes conditionClientAppTypes, ConditionDeviceFilters conditionDeviceFilters, ConditionLocations conditionLocations, ConditionPlatforms conditionPlatforms, ConditionRisks conditionRisks, ControlGrantBlock grantControls, ControlSession sessionControls)

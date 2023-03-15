@@ -249,7 +249,7 @@ public class GraphHelper
             }
         }
 
-        if (_configOptions.IsManual == false)
+        if (_configOptions.IsManual != true)
         {
             await AddAgreements(directoryObjects);
             await AddNamedLocations(directoryObjects);

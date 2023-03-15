@@ -51,6 +51,7 @@ public enum Shape
     IconRiskyUsers,
     IconSessionCaeDisable,
     IconWorkloadIdentity,
+    LastModified,
     Locations,
     PicAccessSecurityInfo,
     PicAccessRegisterDevice,

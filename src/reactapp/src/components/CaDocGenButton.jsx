@@ -38,8 +38,8 @@ export const CaDocGenButton = ({ isManual, caPolicyJson, isMaskPolicy, isMaskGro
             isMaskApplication: isMaskApplication,
             isMaskTenant: isMaskTenant,
             isMaskTermsOfUse: isMaskTermsOfUse,
-            isMaskNamedLocation: isMaskNamedLocation
-
+            isMaskNamedLocation: isMaskNamedLocation,
+            groupSlidesByState: false
         };
 
         let token = "";
