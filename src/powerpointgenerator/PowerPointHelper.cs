@@ -26,6 +26,26 @@ public class PowerPointHelper
         _shapes[shape.ToString()].TextBody.Text = text;
     }
 
+    public void SetTextFormatted(Shape shape, string? text)
+    {
+        var textBody = _shapes[shape.ToString()].TextBody;
+        for (int i = 0; i <= textBody.Paragraphs.Count(); i++) { textBody.Paragraphs.RemoveAt(0); }
+
+        if (!string.IsNullOrEmpty(text))
+        {
+            var lines = text.Split(Environment.NewLine);
+            foreach (var line in lines)
+            {
+                var para = textBody.AddParagraph(line);
+                para.Font.FontSize = 11;
+                if (line.IndexOf("-") < 0)
+                {
+                    para.Font.Bold = true;
+                }
+            }
+        }
+    }
+
     public void Show(bool isShow, params Shape[] shape)
     {
         if (!isShow)

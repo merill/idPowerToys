@@ -101,14 +101,14 @@ public class DocumentGenerator
         ppt.SetText(Shape.LastModified, lastModified);
 
         ppt.SetText(Shape.UserWorkload, assignedUserWorkload.Name);
-        ppt.SetText(Shape.UserWorkloadIncExc, assignedUserWorkload.IncludeExclude);
+        ppt.SetTextFormatted(Shape.UserWorkloadIncExc, assignedUserWorkload.IncludeExclude);
         ppt.Show(assignedUserWorkload.IsWorkload, Shape.IconWorkloadIdentity);
         ppt.Show(!assignedUserWorkload.IsWorkload, Shape.IconGroupIdentity);
         ppt.Show(assignedUserWorkload.HasIncludeRoles, Shape.IconAssignedToRole);
         ppt.Show(assignedUserWorkload.HasIncludeExternalUser || assignedUserWorkload.HasIncludeExternalTenant, Shape.IconAssignedToGuest);
 
         ppt.SetText(Shape.CloudAppAction, assignedCloudAppAction.Name);
-        ppt.SetText(Shape.CloudAppActionIncExc, assignedCloudAppAction.IncludeExclude);
+        ppt.SetTextFormatted(Shape.CloudAppActionIncExc, assignedCloudAppAction.IncludeExclude);
         ppt.Show(assignedCloudAppAction.HasData && !assignedCloudAppAction.IsSelectedAppO365Only, Shape.CloudAppActionIncExc);
         ppt.Show(assignedCloudAppAction.AccessType == AccessType.AppsAll,
             Shape.IconAccessAllCloudApps);
@@ -126,19 +126,19 @@ public class DocumentGenerator
             Shape.IconAccessAzureAD);
 
 
-        if (conditionRisks.HasData) ppt.SetText(Shape.Risks, conditionRisks.IncludeExclude);
+        if (conditionRisks.HasData) ppt.SetTextFormatted(Shape.Risks, conditionRisks.IncludeExclude);
         ppt.Show(!conditionRisks.HasData, Shape.ShadeRisk);
 
-        if (conditionPlatforms.HasData) ppt.SetText(Shape.Platforms, conditionPlatforms.IncludeExclude);
+        if (conditionPlatforms.HasData) ppt.SetTextFormatted(Shape.Platforms, conditionPlatforms.IncludeExclude);
         ppt.Show(!conditionPlatforms.HasData, Shape.ShadeDevicePlatforms);
 
-        if (conditionClientAppTypes.HasData) ppt.SetText(Shape.ClientAppTypes, conditionClientAppTypes.IncludeExclude);
+        if (conditionClientAppTypes.HasData) ppt.SetTextFormatted(Shape.ClientAppTypes, conditionClientAppTypes.IncludeExclude);
         ppt.Show(!conditionClientAppTypes.HasData, Shape.ShadeClientApps);
 
-        if (conditionLocations.HasData) ppt.SetText(Shape.Locations, conditionLocations.IncludeExclude);
+        if (conditionLocations.HasData) ppt.SetTextFormatted(Shape.Locations, conditionLocations.IncludeExclude);
         ppt.Show(!conditionLocations.HasData, Shape.ShadeLocations);
 
-        if (conditionDeviceFilters.HasData) ppt.SetText(Shape.DeviceFilters, conditionDeviceFilters.IncludeExclude);
+        if (conditionDeviceFilters.HasData) ppt.SetTextFormatted(Shape.DeviceFilters, conditionDeviceFilters.IncludeExclude);
         ppt.Show(!conditionDeviceFilters.HasData, Shape.ShadeFilterForDevices);
 
 
@@ -221,6 +221,6 @@ public class DocumentGenerator
 
     private string GetPolicyPortalLink(G.ConditionalAccessPolicy policy)
     {
-        return $"https://entra.microsoft.com/#view/Microsoft_AAD_ConditionalAccess/PolicyBlade/policyId/{policy.Id}";
+        return $"https://entra.microsoft.com/#view/Microsoft_AAD_ConditionalAccess/PolicyBlade/policyId/{policy.Id}\r\n";
     }
 }

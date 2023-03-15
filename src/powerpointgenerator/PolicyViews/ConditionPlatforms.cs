@@ -41,12 +41,12 @@ public class ConditionPlatforms : PolicyView
         foreach (var platform in platforms)
         {
             if (platform == ConditionalAccessDevicePlatform.All) { sb.AppendLine(" - All"); }
-            if (platform == ConditionalAccessDevicePlatform.Android) { sb.AppendLine(" - Android"); }
-            if (platform == ConditionalAccessDevicePlatform.IOS) { sb.AppendLine(" - iOS"); }
-            if (platform == ConditionalAccessDevicePlatform.Linux) { sb.AppendLine(" - Linux"); }
-            if (platform == ConditionalAccessDevicePlatform.MacOS) { sb.AppendLine(" - macOS"); }
-            if (platform == ConditionalAccessDevicePlatform.Windows) { sb.AppendLine(" - Windows"); }
-            if (platform == ConditionalAccessDevicePlatform.WindowsPhone) { sb.AppendLine(" - Windows Phone"); }
+            if (platform == ConditionalAccessDevicePlatform.Android) { sb.AppendLine(" - 📱Android"); }
+            if (platform == ConditionalAccessDevicePlatform.IOS) { sb.AppendLine(" - 📱 iOS"); }
+            if (platform == ConditionalAccessDevicePlatform.Linux) { sb.AppendLine(" - 💻 Linux"); }
+            if (platform == ConditionalAccessDevicePlatform.MacOS) { sb.AppendLine(" - 💻 macOS"); }
+            if (platform == ConditionalAccessDevicePlatform.Windows) { sb.AppendLine(" - 💻 Windows"); }
+            if (platform == ConditionalAccessDevicePlatform.WindowsPhone) { sb.AppendLine(" - ☎️ Windows Phone"); }
         }
     }
 }
