@@ -63,7 +63,7 @@ public static class Helper
 
     public static Users GetConditionsUsersJson(ConditionalAccessConditionSet conditions)
     {
-        var conditionsJson = JsonSerializer.Serialize(conditions, new JsonSerializerOptions { WriteIndented = true });
+        var conditionsJson = JsonSerializer.Serialize(conditions.Users, new JsonSerializerOptions { WriteIndented = true });
         var users = JsonSerializer.Deserialize<Users>(conditionsJson);
         return users;
     }
