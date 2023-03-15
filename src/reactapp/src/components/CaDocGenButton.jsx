@@ -15,7 +15,7 @@ const useStyles = makeStyles({
     },
 });
 
-export const CaDocGenButton = ({ isManual, caPolicyJson, maskOptions, isMaskPolicy, isMaskGroup, isMaskUser, isMaskServicePrincipal, isMaskApplication, isMaskTenant, isMaskTermsOfUse, isMaskNamedLocation }) => {
+export const CaDocGenButton = ({ isManual, caPolicyJson, maskOptions, groupSlidesByState}) => {
     const styles = useStyles();
     const [showProgress, setShowProgress] = useState(false);
     const [showErrorAlert, setShowErrorAlert] = useState(false);
@@ -39,7 +39,7 @@ export const CaDocGenButton = ({ isManual, caPolicyJson, maskOptions, isMaskPoli
             isMaskTenant: maskOptions.includes("External tenant"),
             isMaskTermsOfUse: maskOptions.includes("Terms of use"),
             isMaskNamedLocation: maskOptions.includes("Named location"),
-            groupSlidesByState: false
+            groupSlidesByState: groupSlidesByState
         };
 
         let token = "";

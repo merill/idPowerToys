@@ -75,7 +75,7 @@ export const CaDocGenAuto = (props: Partial<ComboboxProps>) => {
         setSelectedOptions(data.selectedOptions);
       };
     const labelledBy = selectedOptions.length > 0 ? `${comboId} ${selectedListId}` : comboId;
-    const [removeSlideGrouping, setRemoveSlideGrouping] = React.useState();
+    const [removeSlideGrouping, setRemoveSlideGrouping] = React.useState(false);
 
 
     return (
@@ -109,7 +109,7 @@ export const CaDocGenAuto = (props: Partial<ComboboxProps>) => {
 
                 {isSignedIn &&
                     <>
-                        <CaDocGenButton maskOptions={selectedOptions} groupSlidesByState={!setRemoveSlideGrouping}/>
+                        <CaDocGenButton maskOptions={selectedOptions} groupSlidesByState={!removeSlideGrouping}/>
                     </>
                 }
 
