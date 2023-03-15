@@ -10,7 +10,7 @@ import { Login } from '@microsoft/mgt-react';
 import { CaDocGenButton } from '../components/CaDocGenButton';
 import { Alert } from "@fluentui/react-components/unstable";
 import { OptionsRegular, } from "@fluentui/react-icons";
-import { Accordion, AccordionHeader, AccordionItem, AccordionPanel, Switch } from "@fluentui/react-components";
+import { Accordion, AccordionHeader, AccordionItem, AccordionPanel, Checkbox } from "@fluentui/react-components";
 
 const useStyles = makeStyles({
     base: {
@@ -63,15 +63,6 @@ export const CaDocGenAuto = () => {
     const [isMaskTermsOfUse, setIsMaskTermsOfUse] = React.useState(false);
     const [isMaskNamedLocation, setIsMaskNamedLocation] = React.useState(false);
 
-    const onChangeMaskPolicy = React.useCallback((ev) => { setIsMaskPolicy(ev.currentTarget.checked); }, [setIsMaskPolicy]);
-    const onChangeMaskGroup = React.useCallback((ev) => { setIsMaskGroup(ev.currentTarget.checked); }, [setIsMaskGroup]);
-    const onChangeMaskUser = React.useCallback((ev) => { setIsMaskUser(ev.currentTarget.checked); }, [setIsMaskUser]);
-    const onChangeMaskServicePrincipal = React.useCallback((ev) => { setIsMaskServicePrincipal(ev.currentTarget.checked); }, [setIsMaskServicePrincipal]);
-    const onChangeMaskApplication = React.useCallback((ev) => { setIsMaskApplication(ev.currentTarget.checked); }, [setIsMaskApplication]);
-    const onChangeMaskTenant = React.useCallback((ev) => { setIsMaskTenant(ev.currentTarget.checked); }, [setIsMaskTenant]);
-    const onChangeMaskTermsOfUse = React.useCallback((ev) => { setIsMaskTermsOfUse(ev.currentTarget.checked); }, [setIsMaskTermsOfUse]);
-    const onChangeMaskNamedLocation = React.useCallback((ev) => { setIsMaskNamedLocation(ev.currentTarget.checked); }, [setIsMaskNamedLocation]);    
-
     return (
         <>
             <div className={styles.base}>
@@ -83,14 +74,34 @@ export const CaDocGenAuto = () => {
                         </AccordionHeader>
                         <AccordionPanel>
                             <p>Use the option below to remove confidential information from the generated presentation.</p>
-                            <Switch onChange={onChangeMaskPolicy} label={"Mask policy names"} /><br />
-                            <Switch onChange={onChangeMaskGroup} label={"Mask group names"} /><br />
-                            <Switch onChange={onChangeMaskUser} label={"Mask user names"} /><br />
-                            <Switch onChange={onChangeMaskServicePrincipal} label={"Mask service principal names"} /><br />
-                            <Switch onChange={onChangeMaskApplication} label={"Mask applications names"} /><br />
-                            <Switch onChange={onChangeMaskTenant} label={"Mask tenant names"} /><br />
-                            <Switch onChange={onChangeMaskTermsOfUse} label={"Mask terms of use names"} /><br />
-                            <Switch onChange={onChangeMaskNamedLocation} label={"Mask named locations names"} /><br />
+                            <Checkbox
+        checked={
+            isMaskPolicy && isMaskGroup && isMaskUser && isMaskServicePrincipal && isMaskApplication && isMaskTenant && isMaskTermsOfUse && isMaskNamedLocation
+            ? true
+            : !(isMaskPolicy || isMaskGroup || isMaskUser || isMaskServicePrincipal || isMaskApplication || isMaskTenant || isMaskTermsOfUse || isMaskNamedLocation)
+            ? false
+            : "mixed"
+        }
+        onChange={(_ev, data) => {
+            setIsMaskPolicy(!!data.checked);
+            setIsMaskGroup(!!data.checked);
+            setIsMaskUser(!!data.checked);
+            setIsMaskServicePrincipal(!!data.checked);
+            setIsMaskApplication(!!data.checked);
+            setIsMaskTenant(!!data.checked);
+            setIsMaskTermsOfUse(!!data.checked);
+            setIsMaskNamedLocation(!!data.checked);
+        }}
+        label="Select all"
+      /><br />
+                            <Checkbox checked={isMaskPolicy} onChange={() => setIsMaskPolicy((checked) => !checked)} label={"Mask policy names"} /><br />
+                            <Checkbox checked={isMaskGroup} onChange={() => setIsMaskGroup((checked) => !checked)} label={"Mask group names"} /><br />
+                            <Checkbox checked={isMaskUser} onChange={() => setIsMaskUser((checked) => !checked)} label={"Mask user names"} /><br />
+                            <Checkbox checked={isMaskServicePrincipal} onChange={() => setIsMaskServicePrincipal((checked) => !checked)} label={"Mask service principal names"} /><br />
+                            <Checkbox checked={isMaskApplication} onChange={() => setIsMaskApplication((checked) => !checked)} label={"Mask applications names"} /><br />
+                            <Checkbox checked={isMaskTenant} onChange={() => setIsMaskTenant((checked) => !checked)} label={"Mask tenant names"} /><br />
+                            <Checkbox checked={isMaskTermsOfUse} onChange={() => setIsMaskTermsOfUse((checked) => !checked)} label={"Mask terms of use names"} /><br />
+                            <Checkbox checked={isMaskNamedLocation} onChange={() => setIsMaskNamedLocation((checked) => !checked)} label={"Mask named locations names"} /><br />
                         </AccordionPanel>
                     </AccordionItem>
                 </Accordion>
