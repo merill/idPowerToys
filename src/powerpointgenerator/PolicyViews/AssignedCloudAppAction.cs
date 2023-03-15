@@ -99,7 +99,7 @@ public class AssignedCloudAppAction : PolicyView
         {
             var appCount = apps.IncludeApplications.Count();
 
-            sb.AppendLine("Include:");
+            sb.AppendLine("✅ Include:");
             if (_isIncludeAppFilter)
             {
                 AppendFilterRule(sb);
@@ -125,7 +125,7 @@ public class AssignedCloudAppAction : PolicyView
         if (apps.ExcludeApplications.Any() || _isExcludeAppFilter)
         {
             sb.AppendLine();
-            sb.AppendLine("Exclude:");
+            sb.AppendLine("🚫 Exclude:");
 
             if (_isExcludeAppFilter)
             {

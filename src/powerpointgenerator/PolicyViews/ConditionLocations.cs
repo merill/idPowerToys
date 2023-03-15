@@ -16,8 +16,8 @@ public class ConditionLocations : PolicyView
     {
         var sb = new StringBuilder();
 
-        AppendLocations(sb, Policy.Conditions.Locations.IncludeLocations, "Include");
-        AppendLocations(sb, Policy.Conditions.Locations.ExcludeLocations, "Exclude");
+        AppendLocations(sb, Policy.Conditions.Locations.IncludeLocations, "✅ Include");
+        AppendLocations(sb, Policy.Conditions.Locations.ExcludeLocations, "🚫 Exclude");
 
         return sb.ToString();
     }

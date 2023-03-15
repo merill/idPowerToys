@@ -15,7 +15,7 @@ public static class DirectoryRoles
         {
             if (_directoryRolesList == null)
             {
-                var directoryRoles = await graph.DirectoryRoles
+                var directoryRoles = await graph.DirectoryRoleTemplates
                     .Request()
                     .GetAsync();
 
@@ -23,7 +23,7 @@ public static class DirectoryRoles
 
                 foreach (var role in directoryRoles)
                 {
-                    directoryRolesList.Add(role.RoleTemplateId, role.DisplayName);
+                    directoryRolesList.Add(role.Id, role.DisplayName);
                 }
                 _directoryRolesList = directoryRolesList;
             }

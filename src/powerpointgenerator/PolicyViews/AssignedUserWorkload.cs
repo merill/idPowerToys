@@ -96,7 +96,7 @@ public class AssignedUserWorkload : PolicyView
         var sb = new StringBuilder();
         if (apps.IncludeServicePrincipals.Any())
         {
-            sb.AppendLine("Include:");
+            sb.AppendLine("✅ Include:");
             if (apps.IncludeServicePrincipals.First() == "ServicePrincipalsInMyTenant")
             {
                 AppendName(sb, "All owned service principals");
@@ -109,7 +109,7 @@ public class AssignedUserWorkload : PolicyView
         }
         if (apps.ExcludeServicePrincipals.Any())
         {
-            sb.AppendLine("Exclude:");
+            sb.AppendLine("🚫 Exclude:");
             AppendObjectNames(sb, apps.ExcludeServicePrincipals);
         }
         return sb.ToString();
@@ -124,7 +124,7 @@ public class AssignedUserWorkload : PolicyView
 
         if (HasIncludeUsers || HasIncludeGroups || HasIncludeRoles || HasIncludeExternalUser || HasIncludeExternalTenant)
         {
-            sb.AppendLine("Include:");
+            sb.AppendLine("✅ Include:");
             if (HasIncludeExternalUser || HasIncludeExternalTenant)
             {
                 sb.AppendLine(" Guest or external users");
@@ -150,7 +150,7 @@ public class AssignedUserWorkload : PolicyView
 
         if (HasExcludeUsers || HasExcludeGroups || HasExcludeRoles || HasExcludeExternalUser || HasExcludeExternalTenant)
         {
-            sb.AppendLine("Exclude:");
+            sb.AppendLine("🚫 Exclude:");
             if (HasExcludeExternalUser || HasExcludeExternalTenant)
             {
                 sb.AppendLine(" Guest or external users");

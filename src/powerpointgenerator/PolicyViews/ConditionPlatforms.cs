@@ -21,13 +21,13 @@ public class ConditionPlatforms : PolicyView
         {
             if (platforms.IncludePlatforms != null && platforms.IncludePlatforms.Any())
             {
-                sb.AppendLine("Include");
+                sb.AppendLine("✅ Include");
                 AppendPlatforms(sb, platforms.IncludePlatforms);
                 sb.AppendLine();
             }
             if (platforms.ExcludePlatforms != null && platforms.ExcludePlatforms.Any())
             {
-                sb.AppendLine("Exclude");
+                sb.AppendLine("🚫 Exclude");
                 AppendPlatforms(sb, platforms.ExcludePlatforms);
                 sb.AppendLine();
             }
