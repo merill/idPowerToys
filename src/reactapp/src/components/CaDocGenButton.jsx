@@ -28,6 +28,10 @@ export const CaDocGenButton = ({ isManual, caPolicyJson, maskOptions, groupSlide
         setShowProgress(true);
         setShowErrorAlert(false);
 
+        if (maskOptions == null) { maskOptions = [""] }
+        if (groupSlidesByState == null) { groupSlidesByState = true; }
+
+        if (maskOptions == null) { maskOptions = [""] }
         let policy = {
             conditionalAccessPolicyJson: caPolicyJson,
             isManual: isManual,
