@@ -30,9 +30,17 @@ public class PowerPointController : ControllerBase
         }
         else
         {
-            StringValues accessToken;
-            Request.Headers.TryGetValue("X-PowerPointGeneration-Token", out accessToken);
-            await graphData.CollectData(accessToken);
+            Request.Headers.TryGetValue("X-PowerPointGeneration-Token", out StringValues accessToken);
+            var token = accessToken.FirstOrDefault();
+            if (token != null)
+            {
+                await graphData.CollectData(token);
+            }
+            else
+            {
+
+            }
+            
         }
 
 

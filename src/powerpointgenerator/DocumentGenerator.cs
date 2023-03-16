@@ -6,7 +6,7 @@ namespace IdPowerToys.PowerPointGenerator;
 
 public class DocumentGenerator
 {
-    private GraphData _graphData;
+    private GraphData _graphData = new(new ConfigOptions());
 
     public void GeneratePowerPoint(GraphData graphData, string templateFilePath, Stream outputStream, ConfigOptions configOptions)
     {
@@ -17,20 +17,18 @@ public class DocumentGenerator
 
         SetTitleSlideInfo(pptxDoc.Slides[0]);
         var templateSlide = pptxDoc.Slides[1];
-
-        if (configOptions.GroupSlidesByState == true)
-        {            
-            var enabledPolicies = from p in policies where p.State ==   ConditionalAccessPolicyState.Enabled select p;
-            var disabledPolicies = from p in policies where p.State == ConditionalAccessPolicyState.Disabled select p;
-            var reportOnlyPolicies = from p in policies where p.State == ConditionalAccessPolicyState.EnabledForReportingButNotEnforced select p;
-
-            AddSlides(pptxDoc, policies, "Enabled Policies", ConditionalAccessPolicyState.Enabled);
-            AddSlides(pptxDoc, policies, "Report-only Policies", ConditionalAccessPolicyState.EnabledForReportingButNotEnforced);
-            AddSlides(pptxDoc, policies, "Disabled Policies", ConditionalAccessPolicyState.Disabled);
-        }
-        else
+        if (policies != null)
         {
-            AddSlides(pptxDoc, policies, "Policies", null);
+            if (configOptions.GroupSlidesByState == true)
+            {
+                AddSlides(pptxDoc, policies, "Enabled Policies", ConditionalAccessPolicyState.Enabled);
+                AddSlides(pptxDoc, policies, "Report-only Policies", ConditionalAccessPolicyState.EnabledForReportingButNotEnforced);
+                AddSlides(pptxDoc, policies, "Disabled Policies", ConditionalAccessPolicyState.Disabled);
+            }
+            else
+            {
+                AddSlides(pptxDoc, policies, "Policies", null);
+            }
         }
         pptxDoc.Slides.Remove(templateSlide);
         pptxDoc.Save(outputStream);
@@ -170,7 +168,11 @@ public class DocumentGenerator
         if (sessionControls.ContinousAccessEvaluation)
         {
             ppt.SetText(Shape.SessionCaeMode, sessionControls.ContinousAccessEvaluationModeLabel);
-            ppt.Show(policy.SessionControls.ContinuousAccessEvaluation.Mode == ContinuousAccessEvaluationMode.Disabled, Shape.IconSessionCaeDisable);
+            if(policy.SessionControls?.ContinuousAccessEvaluation != null)
+            {
+                ppt.Show(policy.SessionControls.ContinuousAccessEvaluation.Mode == ContinuousAccessEvaluationMode.Disabled, Shape.IconSessionCaeDisable);
+            }
+            
         }
         ppt.Show(!sessionControls.DisableResilienceDefaults, Shape.ShadeSessionDisableResilience);
         ppt.Show(!sessionControls.SecureSignInSession, Shape.ShadeSessionSecureSignIn);
@@ -206,10 +208,10 @@ public class DocumentGenerator
         var ppt = new PowerPointHelper(slide);
         if (_graphData.Organization != null && _graphData.Organization.Count > 0)
         {
-            var org = _graphData.Organization.FirstOrDefault();
+            var org = _graphData.Organization.First();
             ppt.SetText(Shape.TenantId, $"{org.Id}");
             ppt.SetText(Shape.TenantName, $"{org.DisplayName}");
-            ppt.SetText(Shape.GeneratedBy, $"{_graphData.Me.DisplayName} ({_graphData.Me.UserPrincipalName})");
+            ppt.SetText(Shape.GeneratedBy, $"{_graphData?.Me?.DisplayName} ({_graphData?.Me?.UserPrincipalName})");
         }
 
         ppt.SetText(Shape.GenerationDate, DateTime.Now.ToString("dd MMM yyyy"));

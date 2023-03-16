@@ -105,13 +105,12 @@ public class ControlGrantBlock : PolicyView
             }
         }
 
-        var grantControlsJson = Helper.GetConditionsGrantsJson(Policy.GrantControls);
-        
-        if (grantControlsJson != null && grantControlsJson.authenticationStrength != null)
+        var authStrength = Policy.GrantControls.AuthenticationStrength;
+        if (authStrength != null)
         {
             Name += "-MFA Strength";
             AuthenticationStrength = true;
-            AuthenticationStrengthName = $"Auth strength:{grantControlsJson.authenticationStrength.displayName}";
+            AuthenticationStrengthName = $"Auth strength:{authStrength.DisplayName}";
         }
 
         return sb.ToString();

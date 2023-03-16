@@ -1,4 +1,5 @@
-﻿using Microsoft.Graph;
+﻿using Azure.Core;
+using Microsoft.Graph.Beta.Models.ODataErrors;
 using System.Collections.Specialized;
 using System.Text.Json.Serialization;
 
@@ -7,13 +8,15 @@ namespace IdPowerToys.PowerPointGenerator;
 public class GraphHelper
 {
     private ConfigOptions _configOptions;
-    GraphServiceClient? _graph;
+    GraphServiceClient _graph;
     public GraphServiceClient GraphServiceClient { get { return _graph; } }
 
     /// <summary>
     /// Perform a manual generation without making Graph API calls
     /// </summary>
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public GraphHelper(ConfigOptions configOptions)
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     {
         _configOptions = configOptions;
     }
@@ -23,36 +26,52 @@ public class GraphHelper
         _graph = graphServiceClient;
     }
 
-    public async Task<User> GetMe()
+    public async Task<User?> GetMe()
     {
-        var me = await _graph.Me.GetAsync();
-        return me;
+        try
+        {
+            var me = await _graph.Me.GetAsync();
+            return me;
+        }
+        catch { return null; }
     }
 
-    public async Task<ICollection<Organization>> GetOrganization()
+
+    public async Task<List<Organization>?> GetOrganization()
     {
-        var org = await _graph.Organization.GetAsync();
-        return org.Value;
+        try
+        {
+            var org = await _graph.Organization.GetAsync();
+            return org?.Value;
+        }
+        catch { return null; }
     }
 
     public async Task<string?> GetTenantName(string tenantId)
     {
-        try {
-            var tenantInfo = await _graph.TenantRelationships.FindTenantInformationByTenantIdWithTenantId(tenantId).GetAsync();
-            return tenantInfo.DisplayName;
-        }
-        catch(Exception ex)
+        try 
         {
-            return null;
+            var tenantInfo = await _graph.TenantRelationships.FindTenantInformationByTenantIdWithTenantId(tenantId).GetAsync();
+            return tenantInfo?.DisplayName;
         }
+        catch { return null; }
     }
 
-    public async Task<List<ConditionalAccessPolicy>> GetPolicies()
+    public async Task<List<ConditionalAccessPolicy>?> GetPolicies()
     {
-        var policies = await _graph.Identity.ConditionalAccess.Policies
-            //.Filter("id eq '80f881c0-ab7c-426e-955d-9d48717d7659'")//.Top(10)
-            .GetAsync();
-        return policies.Value;
+        try
+        {
+            //var policies = await _graph.Identity.ConditionalAccess.Policies.GetAsync();
+
+            var policies = await _graph.Policies.ConditionalAccessPolicies.GetAsync((requestConfiguration) =>
+            {
+                requestConfiguration.QueryParameters.Filter = "id eq 'dd0766c1-aee7-44c4-b764-f611d66f374b'";
+                requestConfiguration.Headers.Add("ConsistencyLevel", "eventual");
+            });
+
+            return policies?.Value;
+        }
+        catch { return null; }
     }
 
     private async Task<string?> GetUserName(string id)
@@ -60,15 +79,17 @@ public class GraphHelper
         try
         {
             var user = await _graph.Users[id].GetAsync();
-            return user.DisplayName;
+            return user?.DisplayName;
         }
-        catch (ServiceException ex) when (ex.ResponseStatusCode == 404)
+        catch (ODataError err) when (err.ResponseStatusCode == 404)
+        {
+            return $"Deleted user {Helper.GetShortId(id)}";
+        }
+        catch
         {
             return Helper.GetShortId(id);
         }
     }
-
-
 
     private string GetManualObjectName(string id, int index, string prefix)
     {
@@ -79,11 +100,33 @@ public class GraphHelper
         try
         {
             var user = await _graph.Groups[id].GetAsync();
-            return user.DisplayName;
+            return user?.DisplayName;
         }
-        catch (ServiceException ex) when (ex.ResponseStatusCode == 404)
+        catch (ODataError err) when (err.ResponseStatusCode == 404)
+        {
+            return $"Deleted group {Helper.GetShortId(id)}";
+        }
+        catch 
         {
             return Helper.GetShortId(id);
+        }
+    }
+
+    private async Task<long?> GetGroupCount(string id)
+    {
+        try
+        {
+            var count = await _graph.Groups[id].TransitiveMembers.GetAsync((requestConfiguration) =>
+            {
+                requestConfiguration.QueryParameters.Count = true;
+                requestConfiguration.QueryParameters.Top = 1;
+                requestConfiguration.Headers.Add("ConsistencyLevel", "eventual");
+            });
+            return count?.OdataCount;
+        }
+        catch
+        { 
+            return null;
         }
     }
 
@@ -92,9 +135,13 @@ public class GraphHelper
         try
         {
             var sp = await _graph.ServicePrincipals[id].GetAsync();
-            return sp.DisplayName;
+            return sp?.DisplayName;
         }
-        catch (ServiceException ex) when (ex.ResponseStatusCode == 404)
+        catch (ODataError err) when (err.ResponseStatusCode == 404)
+        {
+            return $"Deleted service principal {Helper.GetShortId(id)}";
+        }
+        catch
         {
             return Helper.GetShortId(id);
         }
@@ -107,27 +154,28 @@ public class GraphHelper
             var sp = await _graph.Applications
                 .GetAsync((requestConfiguration) =>
                 {
-                    requestConfiguration.QueryParameters.Filter = "appid eq '";
+                    requestConfiguration.QueryParameters.Filter = $"appid eq '{id}'";
                     requestConfiguration.Headers.Add("ConsistencyLevel", "eventual");
                 });
-            var app = sp.Value;
-            if (app != null || app.Count == 0)
-            {
-                return Helper.GetShortId(id);
-            }
-            else
+            var app = sp?.Value;
+            if (app != null && app.Count > 0)
             {
                 return app[0].DisplayName;
             }
+            else
+            {
+                return $"Deleted application {Helper.GetShortId(id)}";
+            }
         }
-        catch (ServiceException ex) when (ex.ResponseStatusCode == 404)
+        catch
         {
             return Helper.GetShortId(id);
         }
     }
 
-    public async Task<StringDictionary> GetDirectoryObjectCache(ICollection<ConditionalAccessPolicy> policies)
+    public async Task<StringDictionary> GetDirectoryObjectCache(ICollection<ConditionalAccessPolicy>? policies)
     {
+        if(policies == null) { return new StringDictionary(); }
         var directoryObjects = new StringDictionary();
         var userIds = new List<string>();
         var groupIds = new List<string>();
@@ -138,22 +186,34 @@ public class GraphHelper
 
         foreach (var policy in policies)
         {
-            var users = policy.Conditions.Users;
-            userIds.AddRange(users.IncludeUsers);
-            userIds.AddRange(users.ExcludeUsers);
-            groupIds.AddRange(users.IncludeGroups);
-            groupIds.AddRange(users.ExcludeGroups);
-            roleIds.AddRange(users.IncludeRoles);
-            roleIds.AddRange(users.ExcludeRoles);
-            applicationIds.AddRange(policy.Conditions.Applications.IncludeApplications);
-            applicationIds.AddRange(policy.Conditions.Applications.ExcludeApplications);
-            var apps = policy.Conditions.ClientApplications;
-            if (apps != null)
+            var conditions = policy.Conditions;
+            if (conditions != null)
             {
-                servicePrincipalIds.AddRange(apps.IncludeServicePrincipals);
-                servicePrincipalIds.AddRange(apps.ExcludeServicePrincipals);
+                var users = conditions.Users;
+                if (users != null)
+                {
+                    if (users.IncludeUsers != null) { userIds.AddRange(users.IncludeUsers); }
+                    if (users.ExcludeUsers != null) { userIds.AddRange(users.ExcludeUsers); }
+                    if (users.IncludeGroups != null) { groupIds.AddRange(users.IncludeGroups); }
+                    if (users.ExcludeGroups != null) { groupIds.AddRange(users.ExcludeGroups); }
+                    if (users.IncludeRoles != null) { roleIds.AddRange(users.IncludeRoles); }
+                    if (users.ExcludeRoles != null) { roleIds.AddRange(users.ExcludeRoles); }
+                }
+                var apps = conditions.Applications;
+                if (apps != null)
+                {
+                    if (apps.IncludeApplications != null) { applicationIds.AddRange(apps.IncludeApplications); }
+                    if (apps.ExcludeApplications != null) { applicationIds.AddRange(apps.ExcludeApplications); }
+                }
+                var clientApps = conditions.ClientApplications;
+                if(clientApps != null)
+                {
+                    if (clientApps.IncludeServicePrincipals != null) { servicePrincipalIds.AddRange(clientApps.IncludeServicePrincipals); }
+                    if (clientApps.ExcludeServicePrincipals != null) { servicePrincipalIds.AddRange(clientApps.ExcludeServicePrincipals); }
+                }
+
+                tenantIds.AddRange(GetTenantIds(conditions));
             }
-            tenantIds.AddRange(GetTenantIds(policy.Conditions));
         }
 
         int index = 1;
@@ -170,7 +230,18 @@ public class GraphHelper
         {
             if (Guid.TryParse(id, out _))
             {
-                var name = _configOptions.IsManual == true || _configOptions.IsMaskGroup == true ? GetManualObjectName(id, index++, "Group") : await GetGroupName(id);
+                string? name;
+                if(_configOptions.IsManual == true || _configOptions.IsMaskGroup == true)
+                {
+                    name = GetManualObjectName(id, index++, "Group");
+                }
+                else
+                {
+                    name = await GetGroupName(id);
+                    var count = await GetGroupCount(id);
+                    if(count.HasValue) { name = $"{name} ({count})"; }
+                }
+                     
                 directoryObjects.Add(id, name); //TODO use batch
             }
         }
@@ -249,77 +320,97 @@ public class GraphHelper
     private IEnumerable<string> GetTenantIds(ConditionalAccessConditionSet conditions)
     {
         var tenantIds = new List<string>();
-        var usersJson = Helper.GetConditionsUsersJson(conditions);
-        if (usersJson.includeGuestsOrExternalUsers != null)
-        {
-            var externalTenants = usersJson.includeGuestsOrExternalUsers.externalTenants;
-            AppendTenantIds(tenantIds, externalTenants);
-        }
+        var users = conditions.Users;
+        if (users == null) return tenantIds;
 
-        if (usersJson.excludeGuestsOrExternalUsers != null)
-        {
-            var externalTenants = usersJson.excludeGuestsOrExternalUsers.externalTenants;
-            AppendTenantIds(tenantIds, externalTenants);
-        }
+        AppendTenantIds(tenantIds, users.IncludeGuestsOrExternalUsers);
+        AppendTenantIds(tenantIds, users.ExcludeGuestsOrExternalUsers);
+
         return tenantIds;
     }
 
-    private void AppendTenantIds(List<string> tenantIds, ExternalTenants externalTenants)
+    private void AppendTenantIds(List<string> tenantIds, ConditionalAccessGuestsOrExternalUsers? guestsOrExternalUsers)
     {
-        if (externalTenants != null && !string.IsNullOrEmpty(externalTenants.membershipKind))
+
+        if (guestsOrExternalUsers != null && guestsOrExternalUsers.ExternalTenants != null)
         {
-            if(externalTenants.members != null)
+            switch (guestsOrExternalUsers.ExternalTenants.MembershipKind)
             {
-                tenantIds.AddRange(externalTenants.members);
+                case ConditionalAccessExternalTenantsMembershipKind.All:
+                    break;
+
+                case ConditionalAccessExternalTenantsMembershipKind.Enumerated:
+                    var externalTenants = (ConditionalAccessEnumeratedExternalTenants)guestsOrExternalUsers.ExternalTenants;
+                    if (externalTenants != null && externalTenants.Members != null) { tenantIds.AddRange(externalTenants.Members); }
+                    break;
             }
         }
     }
 
     private async Task AddAgreements(StringDictionary directoryObjects)
     {
-        var agreements = await _graph.IdentityGovernance.TermsOfUse.Agreements
-                    .GetAsync();
-        int index = 1;
-        foreach (var ac in agreements.Value)
+        try
         {
-            var name = _configOptions.IsMaskTermsOfUse == true
-                ? GetManualObjectName(ac.Id, index++, "Terms of use") : ac.DisplayName;
-            directoryObjects.Add(ac.Id, name);
+            var agreements = await _graph.IdentityGovernance.TermsOfUse.Agreements.GetAsync();
+            int index = 1;
+            if (agreements?.Value != null)
+            {
+                foreach (var ac in agreements.Value)
+                {
+                    if(ac.Id != null)
+                    {
+                        var name = _configOptions.IsMaskTermsOfUse == true
+                            ? GetManualObjectName(ac.Id, index++, "Terms of use") : ac.DisplayName;
+                        directoryObjects.Add(ac.Id, name);
+                    }
+                }
+            }
         }
+        catch { }
     }
     private async Task AddNamedLocations(StringDictionary directoryObjects)
     {
-        var namedLocations = await _graph.Identity.ConditionalAccess.NamedLocations
-                    .GetAsync();
-
-        int index = 1;
-        foreach (var ac in namedLocations.Value)
+        try
         {
-            var name = _configOptions.IsMaskNamedLocation == true
-                ? GetManualObjectName(ac.Id, index++, "Terms of use") : ac.DisplayName;
-            directoryObjects.Add(ac.Id, ac.DisplayName);
+            var namedLocations = await _graph.Identity.ConditionalAccess.NamedLocations.GetAsync();
+
+            int index = 1;
+            if (namedLocations?.Value != null)
+            {
+                foreach (var ac in namedLocations.Value)
+                {
+                    if (ac?.Id != null)
+                    {
+                        var name = _configOptions.IsMaskNamedLocation == true
+                            ? GetManualObjectName(ac.Id, index++, "Terms of use") : ac.DisplayName;
+                        directoryObjects.Add(ac.Id, ac.DisplayName);
+                    }
+                }
+            }
         }
+        catch { }
     }
 
     internal async Task<StringDictionary> GetAuthenticationContexts()
     {
-        var authContextsGraph = await _graph.Identity.ConditionalAccess.AuthenticationContextClassReferences
-                    .GetAsync();
         var authContexts = new StringDictionary();
-        foreach (var ac in authContextsGraph.Value)
+        try
         {
-            authContexts.Add(ac.Id, ac.DisplayName);
+            var authContextsGraph = await _graph.Identity.ConditionalAccess.AuthenticationContextClassReferences.GetAsync();
+            
+            if(authContextsGraph?.Value != null)
+            {
+                foreach (var ac in authContextsGraph.Value)
+                {
+                    if(ac?.Id != null)
+                    {
+                        authContexts.Add(ac.Id, ac.DisplayName);
+                    }
+                }
+            }
         }
+        catch { }
+
         return authContexts;
     }
-
-    public record TenantInformation(
-        [property: JsonPropertyName("@odata.context")] string odatacontext,
-        [property: JsonPropertyName("tenantId")] string tenantId,
-        [property: JsonPropertyName("federationBrandName")] object federationBrandName,
-        [property: JsonPropertyName("displayName")] string displayName,
-        [property: JsonPropertyName("defaultDomainName")] string defaultDomainName
-    );
-
-
 }

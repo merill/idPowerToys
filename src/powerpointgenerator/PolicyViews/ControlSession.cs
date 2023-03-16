@@ -81,9 +81,8 @@ public class ControlSession : PolicyView
         var disableResilienceDefaults = Policy.SessionControls.DisableResilienceDefaults;
         DisableResilienceDefaults = disableResilienceDefaults != null && disableResilienceDefaults.HasValue && disableResilienceDefaults.Value;
 
-        var sessionControlsJson = Helper.GetSessionControlsJson(Policy.SessionControls);
-
-        if (sessionControlsJson != null && sessionControlsJson.secureSignInSession != null && sessionControlsJson.secureSignInSession.isEnabled)
+        
+        if (Policy.SessionControls.SecureSignInSession?.IsEnabled == true)
         {
             SecureSignInSession = true;
         }

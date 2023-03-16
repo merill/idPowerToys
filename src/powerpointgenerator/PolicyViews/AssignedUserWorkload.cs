@@ -44,45 +44,18 @@ public class AssignedUserWorkload : PolicyView
         IsWorkload = Policy.Conditions.ClientApplications != null && Policy.Conditions.ClientApplications.IncludeServicePrincipals.Count() > 0;
 
         var users = Policy.Conditions.Users;
-        var usersJson = Helper.GetConditionsUsersJson(Policy.Conditions);
 
         //Include users
         HasIncludeUsers = users.IncludeUsers.Count() > 0;
         HasIncludeGroups = users.IncludeGroups.Count() > 0;
         HasIncludeRoles = users.IncludeRoles.Count() > 0;
-
-        if (usersJson.includeGuestsOrExternalUsers != null)
-        {
-            _incGuestsOrExternalUsers = usersJson.includeGuestsOrExternalUsers.guestOrExternalUserTypes;
-            var externalTenants = usersJson.includeGuestsOrExternalUsers.externalTenants;
-            if (externalTenants != null && !string.IsNullOrEmpty(externalTenants.membershipKind))
-            {
-                _incExternalTenantMembershipKind = externalTenants.membershipKind;
-                _incExternalTenantMembers = externalTenants.members;
-            }
-        }
-        
-        HasIncludeExternalUser = !string.IsNullOrEmpty(_incGuestsOrExternalUsers) || !string.IsNullOrEmpty(_incExternalTenantMembershipKind);
-
+        HasIncludeExternalUser = users.IncludeGuestsOrExternalUsers != null;
 
         //Exclude users
         HasExcludeUsers = users.ExcludeUsers.Count() > 0;
         HasExcludeGroups = users.ExcludeGroups.Count() > 0;
         HasExcludeRoles = users.ExcludeRoles.Count() > 0;
-
-        if (usersJson.excludeGuestsOrExternalUsers != null)
-        {
-            _excGuestsOrExternalUsers = usersJson.excludeGuestsOrExternalUsers.guestOrExternalUserTypes;
-            var externalTenants = usersJson.excludeGuestsOrExternalUsers.externalTenants;
-            if (externalTenants != null && !string.IsNullOrEmpty(externalTenants.membershipKind))
-            {
-                _excExternalTenantMembershipKind = externalTenants.membershipKind;
-                _excExternalTenantMembers = externalTenants.members;
-            }
-        }
-
-        HasExcludeExternalUser = !string.IsNullOrEmpty(_excGuestsOrExternalUsers) || !string.IsNullOrEmpty(_excExternalTenantMembershipKind);
-
+        HasExcludeExternalTenant = users.ExcludeGuestsOrExternalUsers != null;
     }
 
 
@@ -125,8 +98,8 @@ public class AssignedUserWorkload : PolicyView
             if (HasIncludeExternalUser || HasIncludeExternalTenant)
             {
                 sb.AppendLine(" Guest or external users");
-                AppendExternalUserTypes(sb, _incGuestsOrExternalUsers);
-                AppendExternalTenants(sb, _incExternalTenantMembershipKind, _incExternalTenantMembers);
+                AppendExternalUserTypes(sb, users.IncludeGuestsOrExternalUsers.GuestOrExternalUserTypes);
+                AppendExternalTenants(sb, users.IncludeGuestsOrExternalUsers.ExternalTenants);
             }
             if (HasIncludeRoles)
             {
@@ -151,8 +124,8 @@ public class AssignedUserWorkload : PolicyView
             if (HasExcludeExternalUser || HasExcludeExternalTenant)
             {
                 sb.AppendLine(" Guest or external users");
-                AppendExternalUserTypes(sb, _excGuestsOrExternalUsers);
-                AppendExternalTenants(sb, _excExternalTenantMembershipKind, _excExternalTenantMembers);
+                AppendExternalUserTypes(sb, users.ExcludeGuestsOrExternalUsers.GuestOrExternalUserTypes);
+                AppendExternalTenants(sb, users.ExcludeGuestsOrExternalUsers.ExternalTenants);
             }
             if (HasExcludeRoles)
             {
@@ -184,55 +157,62 @@ public class AssignedUserWorkload : PolicyView
     {
         sb.AppendLine($"  - {name}"); 
     }
-    private void AppendExternalUserTypes(StringBuilder sb, string? guestOrExternalUserTypes)
+    private void AppendExternalUserTypes(StringBuilder sb, ConditionalAccessGuestOrExternalUserTypes? guestsOrExternalUserTypes)
     {
-        if (string.IsNullOrEmpty(guestOrExternalUserTypes)) return;
-
-        foreach (var type in guestOrExternalUserTypes.Split(','))
-        {
-            switch (type)
-            {
-                case "internalGuest":
-                    sb.AppendLine("  - Local guest users");
-                    break;
-                case "b2bCollaborationGuest":
-                    sb.AppendLine("  - B2B collaboration guest users");
-                    break;
-                case "b2bCollaborationMember":
-                    sb.AppendLine("  - B2B collaboration member users");
-                    break;
-                case "b2bDirectConnectUser":
-                    sb.AppendLine("  - B2B direct connect users");
-                    break;
-                case "otherExternalUser":
-                    sb.AppendLine("  - Other external users");
-                    break;
-                case "serviceProvider":
-                    sb.AppendLine("  - Service provider users");
-                    break;
-                default:
-                    sb.AppendLine(type);
-                    break;
-            }
-        }
+        var type = guestsOrExternalUserTypes.Value;
+        //TODO :need to show this once c# sdk has value
+        //foreach (var type in guestOrExternalUserTypes.Split(','))
+        //{
+        //    switch (type)
+        //    {
+        //        case "internalGuest":
+        //            sb.AppendLine("  - Local guest users");
+        //            break;
+        //        case "b2bCollaborationGuest":
+        //            sb.AppendLine("  - B2B collaboration guest users");
+        //            break;
+        //        case "b2bCollaborationMember":
+        //            sb.AppendLine("  - B2B collaboration member users");
+        //            break;
+        //        case "b2bDirectConnectUser":
+        //            sb.AppendLine("  - B2B direct connect users");
+        //            break;
+        //        case "otherExternalUser":
+        //            sb.AppendLine("  - Other external users");
+        //            break;
+        //        case "serviceProvider":
+        //            sb.AppendLine("  - Service provider users");
+        //            break;
+        //        default:
+        //            sb.AppendLine(type);
+        //            break;
+        //    }
+        //}
     }
 
-    private void AppendExternalTenants(StringBuilder sb, string? externalTenantMembershipKind, IReadOnlyList<string> externalTenantMembers)
+    private void AppendExternalTenants(StringBuilder sb, ConditionalAccessExternalTenants externalTenants)
     {
-        if (string.IsNullOrEmpty(externalTenantMembershipKind) || externalTenantMembers == null) return;
 
-        if (externalTenantMembershipKind == "All")
+        if (externalTenants != null)
         {
-            sb.AppendLine("  All external Azure AD organizations");
-        }
-        else
-        {
-            sb.AppendLine("  Selected external Azure AD organizations");
-            foreach (var tenantId in externalTenantMembers)
+            switch (externalTenants.MembershipKind)
             {
-                string tenantName = Helper.GetObjectName(GraphData.ObjectCache, tenantId);
-                if(string.IsNullOrEmpty(tenantId)) { tenantName = tenantId; }
-                sb.AppendLine($"    - {tenantName}");
+                case ConditionalAccessExternalTenantsMembershipKind.All:
+                    sb.AppendLine("  All external Azure AD organizations");
+                    break;
+
+                case ConditionalAccessExternalTenantsMembershipKind.Enumerated:
+                    var enumeratedExternalTenants = (ConditionalAccessEnumeratedExternalTenants)externalTenants;
+                    if (enumeratedExternalTenants != null && enumeratedExternalTenants.Members != null) {
+                        sb.AppendLine("  Selected external Azure AD organizations");
+                        foreach (var tenantId in enumeratedExternalTenants.Members)
+                        {
+                            string tenantName = Helper.GetObjectName(GraphData.ObjectCache, tenantId);
+                            if (string.IsNullOrEmpty(tenantId)) { tenantName = tenantId; }
+                            sb.AppendLine($"    - {tenantName}");
+                        }
+                    }
+                    break;
             }
         }
     }

@@ -15,22 +15,19 @@ public class AssignedCloudAppAction : PolicyView
     public AppAccessType AccessType { get; set; }
     public bool IsSelectedAppO365Only { get; set; }
     private bool _isIncludeAppFilter = false, _isExcludeAppFilter = false;
-    private string _appFilterRule;
+    private string? _appFilterRule;
 
     public AssignedCloudAppAction(ConditionalAccessPolicy policy, GraphData graphData) : base(policy, graphData)
     {
-        var appsJson = Helper.GetConditionsApplicationsJson(Policy.Conditions.Applications); //TODO Remove this once SDK supports appfilter.
-        ApplicationFilter appFilter = null;
-        string appFilterMode = string.Empty;
         
-
-        if (appsJson.applicationFilter != null)
+        ConditionalAccessFilter appFilter = null;
+        
+        if (policy.Conditions.Applications.ApplicationFilter != null)
         {
-            appFilter = appsJson.applicationFilter;
-            appFilterMode = appFilter.mode;
-            _appFilterRule = appFilter.rule;
-            _isIncludeAppFilter = appFilterMode == "include";
-            _isExcludeAppFilter = appFilterMode == "exclude";
+            appFilter = policy.Conditions.Applications.ApplicationFilter;
+            _appFilterRule = appFilter.Rule;
+            _isIncludeAppFilter = appFilter.Mode == FilterMode.Include;
+            _isExcludeAppFilter = appFilter.Mode == FilterMode.Exclude;
         }
 
         AccessType = GetAccessType();
@@ -89,8 +86,6 @@ public class AssignedCloudAppAction : PolicyView
     {
         var apps = conditions.Applications;
         var sb = new StringBuilder();
-
-  
         
         if (apps.IncludeApplications.Any() || _isIncludeAppFilter)
         {

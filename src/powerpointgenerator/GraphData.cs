@@ -21,7 +21,9 @@ public class GraphData
 
     public async Task CollectData(string accessToken)
     {
-        var accessTokenProvider = new BaseBearerTokenAuthenticationProvider(new TokenProvider(accessToken));
+        var tokenProvider = new TokenProvider();
+        tokenProvider.AccessToken= accessToken;
+        var accessTokenProvider = new BaseBearerTokenAuthenticationProvider(tokenProvider);
 
         var graphClient = new GraphServiceClient(accessTokenProvider, "https://graph.microsoft.com/beta");
 
@@ -41,6 +43,8 @@ public class GraphData
 
     public async Task ImportPolicy()
     {
+        if (ConfigOptions.ConditionalAccessPolicyJson == null) return;
+
         JsonNode rootNode = JsonNode.Parse(ConfigOptions.ConditionalAccessPolicyJson)!;
         JsonNode valueNode = rootNode!["value"]!;
         var policyJson = valueNode.ToString();
@@ -54,16 +58,15 @@ public class GraphData
 
 public class TokenProvider : IAccessTokenProvider
 {
-    private string _accessToken;
-    public TokenProvider(string accessToken)
-    {
-        _accessToken = accessToken;
-    }
-    public Task<string> GetAuthorizationTokenAsync(Uri uri, Dictionary<string, object> additionalAuthenticationContext = default,
+    public string? AccessToken { get; set; }
+    
+    public Task<string> GetAuthorizationTokenAsync(Uri uri, Dictionary<string, object>? additionalAuthenticationContext = default,
         CancellationToken cancellationToken = default)
     {
-        return Task.FromResult(_accessToken);
+        return Task.FromResult(AccessToken ?? string.Empty);
     }
 
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Supressing since this is part of interface.
     public AllowedHostsValidator AllowedHostsValidator { get; }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. 
 }

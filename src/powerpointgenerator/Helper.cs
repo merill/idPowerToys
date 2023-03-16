@@ -64,27 +64,6 @@ public static class Helper
         var users = JsonSerializer.Deserialize<Users>(conditionsJson);
         return users;
     }
-
-    public static GrantControls GetConditionsGrantsJson(ConditionalAccessGrantControls controls)
-    {
-        var conditionsJson = JsonSerializer.Serialize(controls, new JsonSerializerOptions { WriteIndented = true });
-        var grantControls = JsonSerializer.Deserialize<GrantControls>(conditionsJson);
-        return grantControls;
-    }
-
-    public static Applications GetConditionsApplicationsJson(ConditionalAccessApplications conditions)
-    {
-        var conditionsJson = JsonSerializer.Serialize(conditions, new JsonSerializerOptions { WriteIndented = true });
-        var applications = JsonSerializer.Deserialize<Applications>(conditionsJson);
-        return applications;
-    }
-
-    public static SessionControls GetSessionControlsJson(ConditionalAccessSessionControls caSessionControls)
-    {
-        var sessionControlsJson = JsonSerializer.Serialize(caSessionControls, new JsonSerializerOptions { WriteIndented = true });
-        var sessionControls = JsonSerializer.Deserialize<SessionControls>(sessionControlsJson);
-        return sessionControls;
-    }
 }
 
 //TODO: Remove these once these are supported in the Graph C# SDK
@@ -107,39 +86,3 @@ public record Users(
     [property: JsonPropertyName("includeGuestsOrExternalUsers")] IncludeGuestsOrExternalUsers includeGuestsOrExternalUsers,
     [property: JsonPropertyName("excludeGuestsOrExternalUsers")] ExcludeGuestsOrExternalUsers excludeGuestsOrExternalUsers
 );
-
-public record AuthenticationStrength(
-    [property: JsonPropertyName("id")] string id,
-    [property: JsonPropertyName("createdDateTime")] DateTime? createdDateTime,
-    [property: JsonPropertyName("modifiedDateTime")] DateTime? modifiedDateTime,
-    [property: JsonPropertyName("displayName")] string displayName,
-    [property: JsonPropertyName("description")] string description,
-    [property: JsonPropertyName("policyType")] string policyType,
-    [property: JsonPropertyName("requirementsSatisfied")] string requirementsSatisfied,
-    [property: JsonPropertyName("allowedCombinations")] IReadOnlyList<string> allowedCombinations
-);
-
-public record GrantControls(
-    [property: JsonPropertyName("authenticationStrength@odata.context")] string authenticationStrengthodatacontext,
-    [property: JsonPropertyName("authenticationStrength")] AuthenticationStrength authenticationStrength
-);
-
-
-public record ApplicationFilter(
-    [property: JsonPropertyName("mode")] string mode,
-    [property: JsonPropertyName("rule")] string rule
-);
-
-public record Applications(
-    [property: JsonPropertyName("applicationFilter")] ApplicationFilter applicationFilter
-);
-
-// Root myDeserializedClass = JsonSerializer.Deserialize<Root>(myJsonResponse);
-public record SessionControls(
-    [property: JsonPropertyName("secureSignInSession")] SecureSignInSession secureSignInSession
-);
-
-public record SecureSignInSession(
-    [property: JsonPropertyName("isEnabled")] bool isEnabled
-);
-
