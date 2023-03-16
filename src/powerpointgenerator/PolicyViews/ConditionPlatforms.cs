@@ -1,7 +1,4 @@
-﻿using Microsoft.Graph;
-using System.Text;
-
-namespace CADocGen.PowerPointGenerator.PolicyViews;
+﻿namespace IdPowerToys.PowerPointGenerator.PolicyViews;
 
 public class ConditionPlatforms : PolicyView
 {
@@ -36,7 +33,7 @@ public class ConditionPlatforms : PolicyView
         return sb.ToString();
     }
 
-    private void AppendPlatforms(StringBuilder sb, IEnumerable<ConditionalAccessDevicePlatform> platforms)
+    private void AppendPlatforms(StringBuilder sb, List<ConditionalAccessDevicePlatform?> platforms)
     {
         foreach (var platform in platforms)
         {

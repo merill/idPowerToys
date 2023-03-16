@@ -1,9 +1,6 @@
-﻿using Microsoft.Graph;
-using System.Text;
+﻿namespace IdPowerToys.PowerPointGenerator.PolicyViews;
 
-namespace CADocGen.PowerPointGenerator.PolicyViews;
-
-public enum AccessType
+public enum AppAccessType
 {
     AppsNone,
     AppsAll,
@@ -15,7 +12,7 @@ public enum AccessType
 }
 public class AssignedCloudAppAction : PolicyView
 {
-    public AccessType AccessType { get; set; }
+    public AppAccessType AccessType { get; set; }
     public bool IsSelectedAppO365Only { get; set; }
     private bool _isIncludeAppFilter = false, _isExcludeAppFilter = false;
     private string _appFilterRule;
@@ -41,50 +38,50 @@ public class AssignedCloudAppAction : PolicyView
 
         switch (AccessType)
         {
-            case AccessType.AppsNone:
+            case AppAccessType.AppsNone:
                 Name = "Azure Active Directory"; //Just show Azure AD icon Only happens with Workload Identities and a block policy
                 IncludeExclude = string.Empty;
                 break;
-            case AccessType.AppsAll:
+            case AppAccessType.AppsAll:
                 Name = "All cloud apps";
                 IncludeExclude = GetCloudAppIncludeExclude(Policy.Conditions);
                 break;
-            case AccessType.AppsSelected:
+            case AppAccessType.AppsSelected:
                 Name = "Selected cloud apps";
                 IncludeExclude = GetCloudAppIncludeExclude(Policy.Conditions);
                 break;
-            case AccessType.UserActionsRegDevice:
+            case AppAccessType.UserActionsRegDevice:
                 Name = "Register or join devices ";
                 break;
-            case AccessType.UserActionsRegSecInfo:
+            case AppAccessType.UserActionsRegSecInfo:
                 Name = "Register security information";
                 break;
-            case AccessType.AuthenticationContext:
+            case AppAccessType.AuthenticationContext:
                 Name = "Authentication context";
                 IncludeExclude = GetAuthContext(Policy.Conditions);
                 break;
-            case AccessType.Unknown:
+            case AppAccessType.Unknown:
                 IncludeExclude = "Unknown";
                 break;
         }
     }
 
-    private AccessType GetAccessType()
+    private AppAccessType GetAccessType()
     {
-        AccessType accessType = AccessType.Unknown;
+        AppAccessType accessType = AppAccessType.Unknown;
         var apps = Policy.Conditions.Applications;
         if (apps.IncludeApplications.Any() || _isIncludeAppFilter)
         {
-            if (apps.IncludeApplications.Contains("None")) { accessType = AccessType.AppsNone; }
-            else if (apps.IncludeApplications.Contains("All")) { accessType = AccessType.AppsAll; }
-            else { accessType = AccessType.AppsSelected; }
+            if (apps.IncludeApplications.Contains("None")) { accessType = AppAccessType.AppsNone; }
+            else if (apps.IncludeApplications.Contains("All")) { accessType = AppAccessType.AppsAll; }
+            else { accessType = AppAccessType.AppsSelected; }
         }
         else if (apps.IncludeUserActions.Any() || _isIncludeAppFilter)
         {
-            if (apps.IncludeUserActions.Contains("urn:user:registersecurityinfo")) { accessType = AccessType.UserActionsRegSecInfo; }
-            else if (apps.IncludeUserActions.Contains("urn:user:registerdevice")) { accessType = AccessType.UserActionsRegDevice; }
+            if (apps.IncludeUserActions.Contains("urn:user:registersecurityinfo")) { accessType = AppAccessType.UserActionsRegSecInfo; }
+            else if (apps.IncludeUserActions.Contains("urn:user:registerdevice")) { accessType = AppAccessType.UserActionsRegDevice; }
         }
-        else if (apps.IncludeAuthenticationContextClassReferences.Any()) { accessType = AccessType.AuthenticationContext; }
+        else if (apps.IncludeAuthenticationContextClassReferences.Any()) { accessType = AppAccessType.AuthenticationContext; }
         return accessType;
     }
 

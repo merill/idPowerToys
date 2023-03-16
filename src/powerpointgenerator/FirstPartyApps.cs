@@ -1,6 +1,6 @@
 ﻿using System.Collections.Specialized;
 
-namespace CADocGen.PowerPointGenerator;
+namespace IdPowerToys.PowerPointGenerator;
 
 public static class FirstPartyApps
 {

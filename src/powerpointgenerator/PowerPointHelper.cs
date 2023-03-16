@@ -1,6 +1,6 @@
 ﻿using Syncfusion.Presentation;
 
-namespace CADocGen.PowerPointGenerator;
+namespace IdPowerToys.PowerPointGenerator;
 
 public class PowerPointHelper
 {

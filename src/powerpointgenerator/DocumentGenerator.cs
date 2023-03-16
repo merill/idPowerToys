@@ -1,11 +1,8 @@
-﻿using G = Microsoft.Graph;
-using Syncfusion.Presentation;
+﻿using S=Syncfusion.Presentation;
 using System.Text.Json;
-using CADocGen.PowerPointGenerator.PolicyViews;
-using IdPowerToys.PowerPointGenerator;
-using System.Text;
+using IdPowerToys.PowerPointGenerator.PolicyViews;
 
-namespace CADocGen.PowerPointGenerator;
+namespace IdPowerToys.PowerPointGenerator;
 
 public class DocumentGenerator
 {
@@ -16,21 +13,20 @@ public class DocumentGenerator
         _graphData = graphData;
         var policies = _graphData.Policies;
 
-        IPresentation pptxDoc = Presentation.Open(templateFilePath);
+        S.IPresentation pptxDoc = S.Presentation.Open(templateFilePath);
 
         SetTitleSlideInfo(pptxDoc.Slides[0]);
         var templateSlide = pptxDoc.Slides[1];
 
         if (configOptions.GroupSlidesByState == true)
-        {
+        {            
+            var enabledPolicies = from p in policies where p.State ==   ConditionalAccessPolicyState.Enabled select p;
+            var disabledPolicies = from p in policies where p.State == ConditionalAccessPolicyState.Disabled select p;
+            var reportOnlyPolicies = from p in policies where p.State == ConditionalAccessPolicyState.EnabledForReportingButNotEnforced select p;
 
-            var enabledPolicies = from p in policies where p.State == G.ConditionalAccessPolicyState.Enabled select p;
-            var disabledPolicies = from p in policies where p.State == G.ConditionalAccessPolicyState.Disabled select p;
-            var reportOnlyPolicies = from p in policies where p.State == G.ConditionalAccessPolicyState.EnabledForReportingButNotEnforced select p;
-
-            AddSlides(pptxDoc, policies, "Enabled Policies", G.ConditionalAccessPolicyState.Enabled);
-            AddSlides(pptxDoc, policies, "Report-only Policies", G.ConditionalAccessPolicyState.EnabledForReportingButNotEnforced);
-            AddSlides(pptxDoc, policies, "Disabled Policies", G.ConditionalAccessPolicyState.Disabled);
+            AddSlides(pptxDoc, policies, "Enabled Policies", ConditionalAccessPolicyState.Enabled);
+            AddSlides(pptxDoc, policies, "Report-only Policies", ConditionalAccessPolicyState.EnabledForReportingButNotEnforced);
+            AddSlides(pptxDoc, policies, "Disabled Policies", ConditionalAccessPolicyState.Disabled);
         }
         else
         {
@@ -42,7 +38,7 @@ public class DocumentGenerator
         pptxDoc.Close();
     }
 
-    private void AddSlides(IPresentation pptxDoc, IEnumerable<G.ConditionalAccessPolicy> policies, string? sectionTitle, G.ConditionalAccessPolicyState? policyState)
+    private void AddSlides(S.IPresentation pptxDoc, ICollection<ConditionalAccessPolicy> policies, string? sectionTitle, ConditionalAccessPolicyState? policyState)
     {
         var filteredPolicies = policyState == null
             ? from p in policies orderby p.DisplayName select p
@@ -68,7 +64,7 @@ public class DocumentGenerator
         }
     }
 
-    private void SetPolicySlideInfo(ISlide slide, G.ConditionalAccessPolicy policy, int index)
+    private void SetPolicySlideInfo(S.ISlide slide, ConditionalAccessPolicy policy, int index)
     {
         var assignedUserWorkload = new AssignedUserWorkload(policy, _graphData);
         var assignedCloudAppAction = new AssignedCloudAppAction(policy, _graphData);
@@ -94,9 +90,9 @@ public class DocumentGenerator
 
         ppt.SetText(Shape.PolicyName, policyName);
         ppt.SetLink(Shape.PolicyName, GetPolicyPortalLink(policy));
-        ppt.Show(policy.State == G.ConditionalAccessPolicyState.Enabled, Shape.StateEnabled);
-        ppt.Show(policy.State == G.ConditionalAccessPolicyState.Disabled, Shape.StateDisabled);
-        ppt.Show(policy.State == G.ConditionalAccessPolicyState.EnabledForReportingButNotEnforced, Shape.StateReportOnly);
+        ppt.Show(policy.State == ConditionalAccessPolicyState.Enabled, Shape.StateEnabled);
+        ppt.Show(policy.State == ConditionalAccessPolicyState.Disabled, Shape.StateDisabled);
+        ppt.Show(policy.State == ConditionalAccessPolicyState.EnabledForReportingButNotEnforced, Shape.StateReportOnly);
         string lastModified = GetLastModified(policy);
         ppt.SetText(Shape.LastModified, lastModified);
 
@@ -110,19 +106,19 @@ public class DocumentGenerator
         ppt.SetText(Shape.CloudAppAction, assignedCloudAppAction.Name);
         ppt.SetTextFormatted(Shape.CloudAppActionIncExc, assignedCloudAppAction.IncludeExclude);
         ppt.Show(assignedCloudAppAction.HasData && !assignedCloudAppAction.IsSelectedAppO365Only, Shape.CloudAppActionIncExc);
-        ppt.Show(assignedCloudAppAction.AccessType == AccessType.AppsAll,
+        ppt.Show(assignedCloudAppAction.AccessType == AppAccessType.AppsAll,
             Shape.IconAccessAllCloudApps);
-        ppt.Show(assignedCloudAppAction.AccessType == AccessType.AppsSelected && !assignedCloudAppAction.IsSelectedAppO365Only,
+        ppt.Show(assignedCloudAppAction.AccessType == AppAccessType.AppsSelected && !assignedCloudAppAction.IsSelectedAppO365Only,
             Shape.IconAccessSelectedCloudApps);
         ppt.Show(assignedCloudAppAction.IsSelectedAppO365Only,
             Shape.IconAccessOffice365, Shape.PicAccessOffice365);
-        ppt.Show(assignedCloudAppAction.AccessType == AccessType.UserActionsRegSecInfo,
+        ppt.Show(assignedCloudAppAction.AccessType == AppAccessType.UserActionsRegSecInfo,
             Shape.IconAccessMySecurityInfo, Shape.PicAccessSecurityInfo);
-        ppt.Show(assignedCloudAppAction.AccessType == AccessType.UserActionsRegDevice,
+        ppt.Show(assignedCloudAppAction.AccessType == AppAccessType.UserActionsRegDevice,
             Shape.IconAccessRegisterOrJoinDevice, Shape.PicAccessRegisterDevice);
-        ppt.Show(assignedCloudAppAction.AccessType == AccessType.AuthenticationContext,
+        ppt.Show(assignedCloudAppAction.AccessType == AppAccessType.AuthenticationContext,
             Shape.IconAccessAuthenticationContext);
-        ppt.Show(assignedCloudAppAction.AccessType == AccessType.AppsNone,
+        ppt.Show(assignedCloudAppAction.AccessType == AppAccessType.AppsNone,
             Shape.IconAccessAzureAD);
 
 
@@ -174,7 +170,7 @@ public class DocumentGenerator
         if (sessionControls.ContinousAccessEvaluation)
         {
             ppt.SetText(Shape.SessionCaeMode, sessionControls.ContinousAccessEvaluationModeLabel);
-            ppt.Show(policy.SessionControls.ContinuousAccessEvaluation.Mode == G.ContinuousAccessEvaluationMode.Disabled, Shape.IconSessionCaeDisable);
+            ppt.Show(policy.SessionControls.ContinuousAccessEvaluation.Mode == ContinuousAccessEvaluationMode.Disabled, Shape.IconSessionCaeDisable);
         }
         ppt.Show(!sessionControls.DisableResilienceDefaults, Shape.ShadeSessionDisableResilience);
         ppt.Show(!sessionControls.SecureSignInSession, Shape.ShadeSessionSecureSignIn);
@@ -186,7 +182,7 @@ public class DocumentGenerator
         notes.NotesTextBody.AddParagraph(json);
     }
 
-    private static string GetLastModified(G.ConditionalAccessPolicy policy)
+    private static string GetLastModified(ConditionalAccessPolicy policy)
     {
         const string dateLabel = "Last modified: ";
         const string dateFormat = "yyyy-MM-dd";
@@ -196,7 +192,7 @@ public class DocumentGenerator
         return dateValue;
     }
 
-    private string GetPolicyName(G.ConditionalAccessPolicy policy, int index, AssignedUserWorkload assignedUserWorkload, AssignedCloudAppAction assignedCloudAppAction, ConditionClientAppTypes conditionClientAppTypes, ConditionDeviceFilters conditionDeviceFilters, ConditionLocations conditionLocations, ConditionPlatforms conditionPlatforms, ConditionRisks conditionRisks, ControlGrantBlock grantControls, ControlSession sessionControls)
+    private string GetPolicyName(ConditionalAccessPolicy policy, int index, AssignedUserWorkload assignedUserWorkload, AssignedCloudAppAction assignedCloudAppAction, ConditionClientAppTypes conditionClientAppTypes, ConditionDeviceFilters conditionDeviceFilters, ConditionLocations conditionLocations, ConditionPlatforms conditionPlatforms, ConditionRisks conditionRisks, ControlGrantBlock grantControls, ControlSession sessionControls)
     {
         var sb = new StringBuilder("CA");
         sb.Append(index.ToString("000"));
@@ -205,7 +201,7 @@ public class DocumentGenerator
         return sb.ToString();
     }
 
-    private void SetTitleSlideInfo(ISlide slide)
+    private void SetTitleSlideInfo(S.ISlide slide)
     {
         var ppt = new PowerPointHelper(slide);
         if (_graphData.Organization != null && _graphData.Organization.Count > 0)
@@ -219,7 +215,7 @@ public class DocumentGenerator
         ppt.SetText(Shape.GenerationDate, DateTime.Now.ToString("dd MMM yyyy"));
     }
 
-    private string GetPolicyPortalLink(G.ConditionalAccessPolicy policy)
+    private string GetPolicyPortalLink(ConditionalAccessPolicy policy)
     {
         return $"https://entra.microsoft.com/#view/Microsoft_AAD_ConditionalAccess/PolicyBlade/policyId/{policy.Id}\r\n";
     }

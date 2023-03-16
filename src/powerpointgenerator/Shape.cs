@@ -1,4 +1,4 @@
-﻿namespace CADocGen.PowerPointGenerator;
+﻿namespace IdPowerToys.PowerPointGenerator;
 
 // Generated from PowerPoint slide using GenerateEnums method in TestGeneration
 public enum Shape

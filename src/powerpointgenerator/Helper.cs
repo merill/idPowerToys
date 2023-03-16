@@ -1,11 +1,8 @@
-﻿using CADocGen.PowerPointGenerator.PolicyViews;
-using Microsoft.Graph;
-using System.Collections.Specialized;
-using System.Text;
+﻿using System.Collections.Specialized;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace CADocGen.PowerPointGenerator;
+namespace IdPowerToys.PowerPointGenerator;
 
 public static class Helper
 {

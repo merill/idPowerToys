@@ -1,11 +1,8 @@
 ﻿using Microsoft.Graph;
 using System.Collections.Specialized;
-using System.Net;
-using System.Net.Http.Json;
 using System.Text.Json.Serialization;
-using IdPowerToys.PowerPointGenerator;
 
-namespace CADocGen.PowerPointGenerator;
+namespace IdPowerToys.PowerPointGenerator;
 
 public class GraphHelper
 {
@@ -28,26 +25,21 @@ public class GraphHelper
 
     public async Task<User> GetMe()
     {
-        var me = await _graph.Me
-            .Request()
-            .GetAsync();
+        var me = await _graph.Me.GetAsync();
         return me;
     }
 
     public async Task<ICollection<Organization>> GetOrganization()
     {
-        var org = await _graph.Organization
-            .Request()
-            .GetAsync();
-        return org;
+        var org = await _graph.Organization.GetAsync();
+        return org.Value;
     }
 
     public async Task<string?> GetTenantName(string tenantId)
     {
         try {
-            var tenantInfo = await _graph.HttpProvider.SendAsync(new HttpRequestMessage(HttpMethod.Get, $"https://graph.microsoft.com/beta/tenantRelationships/findTenantInformationByTenantId(tenantId='{tenantId}')"));
-            var info = await tenantInfo.Content.ReadFromJsonAsync<TenantInformation>();
-            return info.displayName;
+            var tenantInfo = await _graph.TenantRelationships.FindTenantInformationByTenantIdWithTenantId(tenantId).GetAsync();
+            return tenantInfo.DisplayName;
         }
         catch(Exception ex)
         {
@@ -55,24 +47,22 @@ public class GraphHelper
         }
     }
 
-    public async Task<ICollection<ConditionalAccessPolicy>> GetPolicies()
+    public async Task<List<ConditionalAccessPolicy>> GetPolicies()
     {
         var policies = await _graph.Identity.ConditionalAccess.Policies
-            .Request()//.Filter("id eq '80f881c0-ab7c-426e-955d-9d48717d7659'")//.Top(10)
+            //.Filter("id eq '80f881c0-ab7c-426e-955d-9d48717d7659'")//.Top(10)
             .GetAsync();
-        return policies;
+        return policies.Value;
     }
 
     private async Task<string?> GetUserName(string id)
     {
         try
         {
-            var user = await _graph.Users[id]
-                .Request()
-                .GetAsync();
+            var user = await _graph.Users[id].GetAsync();
             return user.DisplayName;
         }
-        catch (ServiceException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+        catch (ServiceException ex) when (ex.ResponseStatusCode == 404)
         {
             return Helper.GetShortId(id);
         }
@@ -88,12 +78,10 @@ public class GraphHelper
     {
         try
         {
-            var user = await _graph.Groups[id]
-                .Request()
-                .GetAsync();
+            var user = await _graph.Groups[id].GetAsync();
             return user.DisplayName;
         }
-        catch (ServiceException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+        catch (ServiceException ex) when (ex.ResponseStatusCode == 404)
         {
             return Helper.GetShortId(id);
         }
@@ -103,12 +91,10 @@ public class GraphHelper
     {
         try
         {
-            var sp = await _graph.ServicePrincipals[id]
-                .Request()
-                .GetAsync();
+            var sp = await _graph.ServicePrincipals[id].GetAsync();
             return sp.DisplayName;
         }
-        catch (ServiceException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+        catch (ServiceException ex) when (ex.ResponseStatusCode == 404)
         {
             return Helper.GetShortId(id);
         }
@@ -119,19 +105,22 @@ public class GraphHelper
         try
         {
             var sp = await _graph.Applications
-                .Request().Filter($"appid eq '{id}'")
-                .GetAsync();
-            var app = sp.CurrentPage.FirstOrDefault();
-            if (app == null)
+                .GetAsync((requestConfiguration) =>
+                {
+                    requestConfiguration.QueryParameters.Filter = "appid eq '";
+                    requestConfiguration.Headers.Add("ConsistencyLevel", "eventual");
+                });
+            var app = sp.Value;
+            if (app != null || app.Count == 0)
             {
                 return Helper.GetShortId(id);
             }
             else
             {
-                return app.DisplayName;
+                return app[0].DisplayName;
             }
         }
-        catch (ServiceException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+        catch (ServiceException ex) when (ex.ResponseStatusCode == 404)
         {
             return Helper.GetShortId(id);
         }
@@ -288,13 +277,10 @@ public class GraphHelper
 
     private async Task AddAgreements(StringDictionary directoryObjects)
     {
-
-        //TODO Put generic names if _configOptions.IsMaskName
         var agreements = await _graph.IdentityGovernance.TermsOfUse.Agreements
-                    .Request()
                     .GetAsync();
         int index = 1;
-        foreach (var ac in agreements)
+        foreach (var ac in agreements.Value)
         {
             var name = _configOptions.IsMaskTermsOfUse == true
                 ? GetManualObjectName(ac.Id, index++, "Terms of use") : ac.DisplayName;
@@ -304,11 +290,10 @@ public class GraphHelper
     private async Task AddNamedLocations(StringDictionary directoryObjects)
     {
         var namedLocations = await _graph.Identity.ConditionalAccess.NamedLocations
-                    .Request()
                     .GetAsync();
 
         int index = 1;
-        foreach (var ac in namedLocations)
+        foreach (var ac in namedLocations.Value)
         {
             var name = _configOptions.IsMaskNamedLocation == true
                 ? GetManualObjectName(ac.Id, index++, "Terms of use") : ac.DisplayName;
@@ -319,10 +304,9 @@ public class GraphHelper
     internal async Task<StringDictionary> GetAuthenticationContexts()
     {
         var authContextsGraph = await _graph.Identity.ConditionalAccess.AuthenticationContextClassReferences
-                    .Request()
                     .GetAsync();
         var authContexts = new StringDictionary();
-        foreach (var ac in authContextsGraph)
+        foreach (var ac in authContextsGraph.Value)
         {
             authContexts.Add(ac.Id, ac.DisplayName);
         }

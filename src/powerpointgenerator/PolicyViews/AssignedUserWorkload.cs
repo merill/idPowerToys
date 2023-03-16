@@ -1,7 +1,4 @@
-﻿using Microsoft.Graph;
-using System.Text;
-
-namespace CADocGen.PowerPointGenerator.PolicyViews;
+﻿namespace IdPowerToys.PowerPointGenerator.PolicyViews;
 
 public class AssignedUserWorkload : PolicyView
 {

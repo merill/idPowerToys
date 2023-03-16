@@ -1,11 +1,9 @@
-﻿using IdPowerToys.PowerPointGenerator;
-using Microsoft.Graph;
-using Microsoft.Graph.CallRecords;
+﻿using Microsoft.Kiota.Abstractions.Authentication;
 using System.Collections.Specialized;
-using System.Net.Http.Headers;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 
-namespace CADocGen.PowerPointGenerator;
+namespace IdPowerToys.PowerPointGenerator;
 
 public class GraphData
 {
@@ -23,11 +21,9 @@ public class GraphData
 
     public async Task CollectData(string accessToken)
     {
-        var graphClient = new GraphServiceClient("https://graph.microsoft.com/beta",
-            new DelegateAuthenticationProvider(async (requestMessage) =>
-            {
-                requestMessage.Headers.Authorization = new AuthenticationHeaderValue("bearer", accessToken);
-            }));
+        var accessTokenProvider = new BaseBearerTokenAuthenticationProvider(new TokenProvider(accessToken));
+
+        var graphClient = new GraphServiceClient(accessTokenProvider, "https://graph.microsoft.com/beta");
 
         var graphHelper = new GraphHelper(graphClient, ConfigOptions);
 
@@ -48,9 +44,26 @@ public class GraphData
         JsonNode rootNode = JsonNode.Parse(ConfigOptions.ConditionalAccessPolicyJson)!;
         JsonNode valueNode = rootNode!["value"]!;
         var policyJson = valueNode.ToString();
-        Policies = new Serializer().DeserializeObject<List<ConditionalAccessPolicy>>(policyJson);
+        Policies = JsonSerializer.Deserialize<List<ConditionalAccessPolicy>>(policyJson);
 
         var graph = new GraphHelper(ConfigOptions);
         ObjectCache = await graph.GetDirectoryObjectCache(Policies);
     }
+}
+
+
+public class TokenProvider : IAccessTokenProvider
+{
+    private string _accessToken;
+    public TokenProvider(string accessToken)
+    {
+        _accessToken = accessToken;
+    }
+    public Task<string> GetAuthorizationTokenAsync(Uri uri, Dictionary<string, object> additionalAuthenticationContext = default,
+        CancellationToken cancellationToken = default)
+    {
+        return Task.FromResult(_accessToken);
+    }
+
+    public AllowedHostsValidator AllowedHostsValidator { get; }
 }

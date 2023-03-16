@@ -1,7 +1,6 @@
 ﻿using Microsoft.Graph;
-using System.Collections.Specialized;
 
-namespace CADocGen.PowerPointGenerator;
+namespace IdPowerToys.PowerPointGenerator;
 
 public static class DirectoryRoles
 {
@@ -16,12 +15,11 @@ public static class DirectoryRoles
             if (_directoryRolesList == null)
             {
                 var directoryRoles = await graph.DirectoryRoleTemplates
-                    .Request()
                     .GetAsync();
 
                 var directoryRolesList = new Dictionary<string, string>();
 
-                foreach (var role in directoryRoles)
+                foreach (var role in directoryRoles.Value)
                 {
                     directoryRolesList.Add(role.Id, role.DisplayName);
                 }

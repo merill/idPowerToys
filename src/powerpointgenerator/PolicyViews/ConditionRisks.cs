@@ -1,8 +1,6 @@
-﻿using CADocGen.PowerPointGenerator.PolicyViews;
-using Microsoft.Graph;
-using System.Text;
+﻿using IdPowerToys.PowerPointGenerator.PolicyViews;
 
-namespace CADocGen.PowerPointGenerator;
+namespace IdPowerToys.PowerPointGenerator;
 
 public class ConditionRisks : PolicyView
 {
@@ -24,7 +22,7 @@ public class ConditionRisks : PolicyView
         return sb.ToString();
     }
 
-    private void AppendRisk(StringBuilder sb, IEnumerable<RiskLevel> riskLevel, string title)
+    private void AppendRisk(StringBuilder sb, List<RiskLevel?> riskLevel, string title)
     {
 
         if (riskLevel != null && riskLevel.Any())
