@@ -38,7 +38,6 @@ export const CaDocGenButton = ({ isManual, caPolicyJson, maskOptions, groupSlide
             isMaskPolicy: maskOptions.includes("Policy name"),
             isMaskGroup: maskOptions.includes("Group"),
             isMaskUser: maskOptions.includes("User"),
-            isMaskServicePrincipal: maskOptions.includes("Service principal"),
             isMaskApplication: maskOptions.includes("Application"),
             isMaskTenant: maskOptions.includes("External tenant"),
             isMaskTermsOfUse: maskOptions.includes("Terms of use"),

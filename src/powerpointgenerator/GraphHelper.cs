@@ -1,7 +1,5 @@
-﻿using Azure.Core;
-using Microsoft.Graph.Beta.Models.ODataErrors;
-using System.Collections.Specialized;
-using System.Text.Json.Serialization;
+﻿using System.Collections.Specialized;
+using Microsoft.Graph;
 
 namespace IdPowerToys.PowerPointGenerator;
 
@@ -49,7 +47,7 @@ public class GraphHelper
 
     public async Task<string?> GetTenantName(string tenantId)
     {
-        try 
+        try
         {
             var tenantInfo = await _graph.TenantRelationships.FindTenantInformationByTenantIdWithTenantId(tenantId).GetAsync();
             return tenantInfo?.DisplayName;
@@ -74,161 +72,64 @@ public class GraphHelper
         catch { return null; }
     }
 
-    private async Task<string?> GetUserName(string id)
-    {
-        try
-        {
-            var user = await _graph.Users[id].GetAsync();
-            return user?.DisplayName;
-        }
-        catch (ODataError err) when (err.ResponseStatusCode == 404)
-        {
-            return $"Deleted user {Helper.GetShortId(id)}";
-        }
-        catch
-        {
-            return Helper.GetShortId(id);
-        }
-    }
-
     private string GetManualObjectName(string id, int index, string prefix)
     {
         return $"{prefix} {index} ({Helper.GetShortId(id)})";
     }
-    private async Task<string?> GetGroupName(string id)
-    {
-        try
-        {
-            var user = await _graph.Groups[id].GetAsync();
-            return user?.DisplayName;
-        }
-        catch (ODataError err) when (err.ResponseStatusCode == 404)
-        {
-            return $"Deleted group {Helper.GetShortId(id)}";
-        }
-        catch 
-        {
-            return Helper.GetShortId(id);
-        }
-    }
-
-    private async Task<long?> GetGroupCount(string id)
-    {
-        try
-        {
-            var count = await _graph.Groups[id].TransitiveMembers.GetAsync((requestConfiguration) =>
-            {
-                requestConfiguration.QueryParameters.Count = true;
-                requestConfiguration.QueryParameters.Top = 1;
-                requestConfiguration.Headers.Add("ConsistencyLevel", "eventual");
-            });
-            return count?.OdataCount;
-        }
-        catch
-        { 
-            return null;
-        }
-    }
-
-    private async Task<string?> GetAppName(string id)
-    {
-        try
-        {
-            var sp = await _graph.ServicePrincipals
-                .GetAsync((requestConfiguration) =>
-                {
-                    requestConfiguration.QueryParameters.Filter = $"appid eq '{id}' or id eq '{id}'";
-                    requestConfiguration.Headers.Add("ConsistencyLevel", "eventual");
-                });
-            var app = sp?.Value;
-            if (app != null && app.Count > 0)
-            {
-                return app[0].DisplayName;
-            }
-            else
-            {
-                return $"Deleted app {Helper.GetShortId(id)}";
-            }
-        }
-        catch
-        {
-            return Helper.GetShortId(id);
-        }
-    }
 
     public async Task<StringDictionary> GetDirectoryObjectCache(ICollection<ConditionalAccessPolicy>? policies)
     {
-        if(policies == null) { return new StringDictionary(); }
+        if (policies == null) { return new StringDictionary(); }
         var directoryObjects = new StringDictionary();
-        var userIds = new List<string>();
         var groupIds = new List<string>();
         var roleIds = new List<string>();
-        var servicePrincipalIds = new List<string>();
-        var applicationIds = new List<string>();
-        var tenantIds = new List<string>();
 
+        var maskUser = _configOptions.IsManual == true || _configOptions.IsMaskUser == true ? "User" : null;
+        var maskGroup = _configOptions.IsManual == true || _configOptions.IsMaskGroup == true ? "Group" : null;
+        var maskApplication = _configOptions.IsManual == true || _configOptions.IsMaskApplication == true ? "App" : null;
+        var maskTenant = _configOptions.IsManual == true || _configOptions.IsMaskTenant == true ? "Tenant" : null;
+        var maskTermsOfUse = _configOptions.IsManual == true || _configOptions.IsMaskTermsOfUse == true ? "Terms of use" : null;
+        var maskNamedLocation = _configOptions.IsManual == true || _configOptions.IsMaskNamedLocation == true ? "Named location" : null;
+
+        Dictionary<string, GraphHelperBatch> dirObjects = new Dictionary<string, GraphHelperBatch>();
         foreach (var policy in policies)
         {
             var conditions = policy.Conditions;
             if (conditions != null)
             {
-                var users = conditions.Users;
-                if (users != null)
-                {
-                    if (users.IncludeUsers != null) { userIds.AddRange(users.IncludeUsers); }
-                    if (users.ExcludeUsers != null) { userIds.AddRange(users.ExcludeUsers); }
-                    if (users.IncludeGroups != null) { groupIds.AddRange(users.IncludeGroups); }
-                    if (users.ExcludeGroups != null) { groupIds.AddRange(users.ExcludeGroups); }
-                    if (users.IncludeRoles != null) { roleIds.AddRange(users.IncludeRoles); }
-                    if (users.ExcludeRoles != null) { roleIds.AddRange(users.ExcludeRoles); }
-                }
-                var apps = conditions.Applications;
-                if (apps != null)
-                {
-                    if (apps.IncludeApplications != null) { applicationIds.AddRange(apps.IncludeApplications); }
-                    if (apps.ExcludeApplications != null) { applicationIds.AddRange(apps.ExcludeApplications); }
-                }
-                var clientApps = conditions.ClientApplications;
-                if(clientApps != null)
-                {
-                    if (clientApps.IncludeServicePrincipals != null) { servicePrincipalIds.AddRange(clientApps.IncludeServicePrincipals); }
-                    if (clientApps.ExcludeServicePrincipals != null) { servicePrincipalIds.AddRange(clientApps.ExcludeServicePrincipals); }
-                }
+                AddDirObjects(dirObjects, conditions.Users?.IncludeUsers, BatchType.User, maskUser);
+                AddDirObjects(dirObjects, conditions.Users?.ExcludeUsers, BatchType.User, maskUser);
+                AddDirObjects(dirObjects, conditions.Users?.IncludeGroups, BatchType.Group, maskGroup);
+                AddDirObjects(dirObjects, conditions.Users?.ExcludeGroups, BatchType.Group, maskGroup);
+                AddDirObjects(dirObjects, conditions.Applications?.IncludeApplications, BatchType.App, maskApplication);
+                AddDirObjects(dirObjects, conditions.Applications?.ExcludeApplications, BatchType.App, maskApplication);
+                AddDirObjects(dirObjects, conditions.ClientApplications?.IncludeServicePrincipals, BatchType.App, maskApplication);
+                AddDirObjects(dirObjects, conditions.ClientApplications?.ExcludeServicePrincipals, BatchType.App, maskApplication);
+                AddDirObjects(dirObjects, GetTenantIds(conditions), BatchType.Tenant, maskTenant);
 
-                tenantIds.AddRange(GetTenantIds(conditions));
+                if (conditions.Users?.IncludeRoles != null) { roleIds.AddRange(conditions.Users.IncludeRoles); }
+                if (conditions.Users?.ExcludeRoles != null) { roleIds.AddRange(conditions.Users.ExcludeRoles); }
+                if (conditions.Users?.IncludeGroups != null) { groupIds.AddRange(conditions.Users.IncludeGroups); }
+                if (conditions.Users?.ExcludeGroups != null) { groupIds.AddRange(conditions.Users.ExcludeGroups); }
+
             }
         }
 
+        await AddBatch(directoryObjects, dirObjects);
+        await AddGroupsCount(directoryObjects, groupIds);
+        await AddRoles(directoryObjects, roleIds);
+
+        if (_configOptions.IsManual != true)
+        {
+            await AddAgreements(directoryObjects, maskTermsOfUse);
+            await AddNamedLocations(directoryObjects, maskNamedLocation);
+        }
+        return directoryObjects;
+    }
+
+    private async Task AddRoles(StringDictionary directoryObjects, List<string> roleIds)
+    {
         int index = 1;
-        foreach (var id in userIds.Distinct())
-        {
-            if (Guid.TryParse(id, out _))
-            {
-                var name = _configOptions.IsManual == true || _configOptions.IsMaskUser == true ? GetManualObjectName(id, index++, "User") : await GetUserName(id);
-                directoryObjects.Add(id, name); //TODO use batch
-            }
-        }
-        index = 1;
-        foreach (var id in groupIds.Distinct())
-        {
-            if (Guid.TryParse(id, out _))
-            {
-                string? name;
-                if(_configOptions.IsManual == true || _configOptions.IsMaskGroup == true)
-                {
-                    name = GetManualObjectName(id, index++, "Group");
-                }
-                else
-                {
-                    name = await GetGroupName(id);
-                    var count = await GetGroupCount(id);
-                    if(count.HasValue) { name = $"{name} ({count})"; }
-                }
-                     
-                directoryObjects.Add(id, name); //TODO use batch
-            }
-        }
-
         if (_configOptions.IsManual == true)
         {
             foreach (var id in roleIds.Distinct())
@@ -236,7 +137,7 @@ public class GraphHelper
                 if (Guid.TryParse(id, out _))
                 {
                     var name = GetManualObjectName(id, index++, "Role");
-                    directoryObjects.Add(id, name); //TODO use batch
+                    directoryObjects.Add(id, name);
                 }
             }
         }
@@ -251,47 +152,151 @@ public class GraphHelper
                 }
             }
         }
-
-        index = 1;
-        var appsp = servicePrincipalIds.Concat(applicationIds).Distinct();
-        foreach(var id in appsp)
-        {
-            if (Guid.TryParse(id, out _))
-            {
-                string? name;
-                if (FirstPartyApps.Apps.ContainsKey(id)) //1P apps may not be found by graph, use static list instead
-                {
-                    name = FirstPartyApps.Apps[id];
-                }
-                else
-                {
-                    name = _configOptions.IsManual == true || _configOptions.IsMaskApplication == true
-                        ? GetManualObjectName(id, index++, "App") : await GetAppName(id);
-                }
-                directoryObjects.Add(id, name); //TODO use batch
-            }
-        }
-
-        index = 1;
-        foreach (var id in tenantIds.Distinct())
-        {
-            if (Guid.TryParse(id, out _))
-            {
-                var name = _configOptions.IsManual == true || _configOptions.IsMaskTenant == true
-                    ? GetManualObjectName(id, index++, "Tenant") : await GetTenantName(id);
-                directoryObjects.Add(id, name); //TODO use batch
-            }
-        }
-
-        if (_configOptions.IsManual != true)
-        {
-            await AddAgreements(directoryObjects);
-            await AddNamedLocations(directoryObjects);
-        }
-        return directoryObjects;
     }
 
-    private IEnumerable<string> GetTenantIds(ConditionalAccessConditionSet conditions)
+    private async Task AddBatch(StringDictionary directoryObjects, Dictionary<string, GraphHelperBatch> dirObjects)
+    {
+        var batch = new BatchRequestContentCollection(_graph);
+        int index = 100;
+        var batchItems = new Dictionary<string, GraphHelperBatch>();
+        foreach (var obj in dirObjects.Values)
+        {
+            if (obj.MaskLabel != null)
+            {
+                directoryObjects.Add(obj.Id, GetManualObjectName(obj.Id, index++, obj.MaskLabel));
+            }
+            else
+            {
+                string? key = null;
+                switch (obj.Type)
+                {
+                    case BatchType.User:
+                        key = await batch.AddBatchRequestStepAsync(_graph.Users[obj.Id].ToGetRequestInformation()); break;
+                    case BatchType.Group:
+                        key = await batch.AddBatchRequestStepAsync(_graph.Groups[obj.Id].ToGetRequestInformation()); break;
+                    case BatchType.App:
+                        key = await batch.AddBatchRequestStepAsync(_graph.ServicePrincipals
+                                            .ToGetRequestInformation((requestConfiguration) =>
+                                            {
+                                                requestConfiguration.QueryParameters.Filter = $"appid eq '{obj.Id}' or id eq '{obj.Id}'";
+                                                requestConfiguration.Headers.Add("ConsistencyLevel", "eventual");
+                                            }));
+                        break;
+                    case BatchType.Tenant:
+                        key = await batch.AddBatchRequestStepAsync(_graph.TenantRelationships.FindTenantInformationByTenantIdWithTenantId(obj.Id).ToGetRequestInformation()); break;
+                }
+                if(key != null) batchItems.Add(key, obj);
+            }
+        }
+
+        var responseBatch = await _graph.Batch.PostAsync(batch);
+        foreach (string key in batchItems.Keys)
+        {
+            var obj = batchItems[key];
+            var res = await responseBatch.GetResponseByIdAsync(key);
+            if (res.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                directoryObjects.Add(obj.Id, GetDeletedLabel(obj));
+            }
+            else
+            {
+                string? name = null;
+                switch(obj.Type)
+                {
+                    case BatchType.User:
+                        var resUser = await responseBatch.GetResponseByIdAsync<User>(key); name = resUser.DisplayName;
+                        break;
+                    case BatchType.Group:
+                        var resGroup = await responseBatch.GetResponseByIdAsync<Group>(key); name = resGroup.DisplayName;
+                        break;
+                    case BatchType.App:
+                        if (FirstPartyApps.Apps.ContainsKey(obj.Id)) //1P apps may not be found by graph, use static list instead
+                        {
+                            name = FirstPartyApps.Apps[obj.Id];
+                        }
+                        else
+                        {
+                            var resSP = await responseBatch.GetResponseByIdAsync<ServicePrincipalCollectionResponse>(key);
+
+                            var app = resSP?.Value;
+                            if (app != null && app.Count > 0)
+                            {
+                                name = app[0].DisplayName;
+                            }
+                            else
+                            {
+                                name = GetDeletedLabel(obj);
+                            }
+                        }
+                        break;
+                    case BatchType.Tenant:
+                        var resTenant = await responseBatch.GetResponseByIdAsync<TenantInformation>(key); name = resTenant.DisplayName;
+                        break;
+                }
+                name = string.IsNullOrEmpty(name) ? Helper.GetShortId(obj.Id) : name;
+                directoryObjects.Add(obj.Id, name);
+            }
+        }
+    }
+
+    private static string GetDeletedLabel(GraphHelperBatch obj)
+    {
+        return $"Deleted {obj.Type.ToString().ToLower()} {Helper.GetShortId(obj.Id)}";
+    }
+
+    private void AddDirObjects(Dictionary<string, GraphHelperBatch> dirObjects, List<string>? ids, BatchType type, string? mask)
+    {
+        if (ids == null) return;
+        foreach (var id in ids)
+        {
+            if (!dirObjects.ContainsKey(id))
+            {
+                if (Guid.TryParse(id, out _))
+                {
+                    dirObjects.Add(id, new GraphHelperBatch() { Id = id, Type = type, MaskLabel = mask });
+                }
+            }
+        }
+    }
+
+    private async Task AddGroupsCount(StringDictionary directoryObjects, List<string> ids)
+    {
+        if (_configOptions.IsManual == true || _configOptions.IsMaskGroup == true) return;
+
+        var batch = new BatchRequestContentCollection(_graph);
+        var batchIds = new StringDictionary();
+        foreach (var id in ids.Distinct())
+        {
+            if (Guid.TryParse(id, out _))
+            {
+                var key = await batch.AddBatchRequestStepAsync(_graph.Groups[id].TransitiveMembers.ToGetRequestInformation((requestConfiguration) =>
+                    {
+                        requestConfiguration.QueryParameters.Count = true;
+                        requestConfiguration.QueryParameters.Top = 1;
+                        requestConfiguration.QueryParameters.Select = new string[] { "displayName" };
+                        requestConfiguration.Headers.Add("ConsistencyLevel", "eventual");
+                    }));
+                batchIds.Add(key, id);
+            }
+        }
+
+        var responseBatch = await _graph.Batch.PostAsync(batch);
+        foreach (string key in batchIds.Keys)
+        {
+            var id = batchIds[key];
+            var res = await responseBatch.GetResponseByIdAsync(key);
+            if (res.IsSuccessStatusCode)
+            {
+                var item = await responseBatch.GetResponseByIdAsync<DirectoryObjectCollectionResponse>(key);
+                if (item.OdataCount != null)
+                {
+                    directoryObjects[id] = directoryObjects[id] + $" ({item.OdataCount})";
+                }
+            }
+        }
+    }
+
+    private List<string> GetTenantIds(ConditionalAccessConditionSet conditions)
     {
         var tenantIds = new List<string>();
         var users = conditions.Users;
@@ -321,7 +326,7 @@ public class GraphHelper
         }
     }
 
-    private async Task AddAgreements(StringDictionary directoryObjects)
+    private async Task AddAgreements(StringDictionary directoryObjects, string? mask)
     {
         try
         {
@@ -331,10 +336,10 @@ public class GraphHelper
             {
                 foreach (var ac in agreements.Value)
                 {
-                    if(ac.Id != null)
+                    if (ac.Id != null)
                     {
                         var name = _configOptions.IsMaskTermsOfUse == true
-                            ? GetManualObjectName(ac.Id, index++, "Terms of use") : ac.DisplayName;
+                            ? GetManualObjectName(ac.Id, index++, mask) : ac.DisplayName;
                         directoryObjects.Add(ac.Id, name);
                     }
                 }
@@ -342,7 +347,7 @@ public class GraphHelper
         }
         catch { }
     }
-    private async Task AddNamedLocations(StringDictionary directoryObjects)
+    private async Task AddNamedLocations(StringDictionary directoryObjects, string? mask)
     {
         try
         {
@@ -356,7 +361,7 @@ public class GraphHelper
                     if (ac?.Id != null)
                     {
                         var name = _configOptions.IsMaskNamedLocation == true
-                            ? GetManualObjectName(ac.Id, index++, "Terms of use") : ac.DisplayName;
+                            ? GetManualObjectName(ac.Id, index++, mask) : ac.DisplayName;
                         directoryObjects.Add(ac.Id, ac.DisplayName);
                     }
                 }
@@ -371,12 +376,12 @@ public class GraphHelper
         try
         {
             var authContextsGraph = await _graph.Identity.ConditionalAccess.AuthenticationContextClassReferences.GetAsync();
-            
-            if(authContextsGraph?.Value != null)
+
+            if (authContextsGraph?.Value != null)
             {
                 foreach (var ac in authContextsGraph.Value)
                 {
-                    if(ac?.Id != null)
+                    if (ac?.Id != null)
                     {
                         authContexts.Add(ac.Id, ac.DisplayName);
                     }
@@ -386,5 +391,21 @@ public class GraphHelper
         catch { }
 
         return authContexts;
+    }
+
+    enum BatchType
+    {
+        User,
+        Group,
+        Role,
+        App,
+        Tenant,
+        GroupCount
+    }
+    class GraphHelperBatch
+    {
+        public string Id { get; set; }
+        public BatchType Type { get; set; }
+        public string? MaskLabel { get; set; }
     }
 }

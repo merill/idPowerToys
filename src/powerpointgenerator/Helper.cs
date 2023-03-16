@@ -1,6 +1,4 @@
 ﻿using System.Collections.Specialized;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace IdPowerToys.PowerPointGenerator;
 

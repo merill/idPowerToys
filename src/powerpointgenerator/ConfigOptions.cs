@@ -1,5 +1,4 @@
-﻿using System;
-namespace IdPowerToys.PowerPointGenerator
+﻿namespace IdPowerToys.PowerPointGenerator
 {
     public class ConfigOptions
     {
@@ -8,7 +7,6 @@ namespace IdPowerToys.PowerPointGenerator
         public bool? IsMaskPolicy { get; set; }
         public bool? IsMaskGroup { get; set; }
         public bool? IsMaskUser { get; set; }
-        public bool? IsMaskServicePrincipal { get; set; }
         public bool? IsMaskApplication { get; set; }
         public bool? IsMaskTenant { get; set; }
         public bool? IsMaskTermsOfUse { get; set; }

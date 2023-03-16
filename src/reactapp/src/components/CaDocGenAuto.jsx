@@ -70,7 +70,7 @@ export const CaDocGenAuto = (props: Partial<ComboboxProps>) => {
     const comboId = useId("combo-multi");
     const selectedListId = `${comboId}-selection`;
     const [selectedOptions, setSelectedOptions] = React.useState([]);
-    const options = ["Policy name", "Group", "User", "Service principal", "Application", "External tenant", "Terms of use", "Named location"];
+    const options = ["Policy name", "Group", "User", "Application", "External tenant", "Terms of use", "Named location"];
     const onSelect: ComboboxProps["onOptionSelect"] = (event, data) => {
         setSelectedOptions(data.selectedOptions);
       };
