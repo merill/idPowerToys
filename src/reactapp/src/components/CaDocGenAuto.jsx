@@ -92,9 +92,9 @@ export const CaDocGenAuto = (props: Partial<ComboboxProps>) => {
                                 <Checkbox
                                     checked={removeSlideGrouping}
                                     onChange={(ev, data) => setRemoveSlideGrouping(data.checked)}
-                                    label="Don't group slides"
+                                    label="Don't group slides by status (enabled, disabled, report only)"
                                     /><br/>
-                                <label id={comboId}>Hide confidential information</label>
+                                <label id={comboId}>Hide PII & confidential information</label>
                                 <Combobox aria-labelledby={labelledBy} multiselect={true} placeholder="Select names to hide" onOptionSelect={onSelect} {...props} >
                                     {options.map((option) => (
                                     <Option key={option}>

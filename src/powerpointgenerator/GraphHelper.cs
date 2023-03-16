@@ -61,13 +61,13 @@ public class GraphHelper
     {
         try
         {
-            //var policies = await _graph.Identity.ConditionalAccess.Policies.GetAsync();
+            var policies = await _graph.Identity.ConditionalAccess.Policies.GetAsync();
 
-            var policies = await _graph.Policies.ConditionalAccessPolicies.GetAsync((requestConfiguration) =>
-            {
-                requestConfiguration.QueryParameters.Filter = "id eq 'dd0766c1-aee7-44c4-b764-f611d66f374b'";
-                requestConfiguration.Headers.Add("ConsistencyLevel", "eventual");
-            });
+            //var policies = await _graph.Policies.ConditionalAccessPolicies.GetAsync((requestConfiguration) =>
+            //{
+            //    requestConfiguration.QueryParameters.Filter = "id eq 'dd0766c1-aee7-44c4-b764-f611d66f374b'";
+            //    requestConfiguration.Headers.Add("ConsistencyLevel", "eventual");
+            //});
 
             return policies?.Value;
         }
@@ -130,31 +130,14 @@ public class GraphHelper
         }
     }
 
-    private async Task<string?> GetServicePrincipalName(string id)
+    private async Task<string?> GetAppName(string id)
     {
         try
         {
-            var sp = await _graph.ServicePrincipals[id].GetAsync();
-            return sp?.DisplayName;
-        }
-        catch (ODataError err) when (err.ResponseStatusCode == 404)
-        {
-            return $"Deleted service principal {Helper.GetShortId(id)}";
-        }
-        catch
-        {
-            return Helper.GetShortId(id);
-        }
-    }
-
-    private async Task<string?> GetApplicationName(string id)
-    {
-        try
-        {
-            var sp = await _graph.Applications
+            var sp = await _graph.ServicePrincipals
                 .GetAsync((requestConfiguration) =>
                 {
-                    requestConfiguration.QueryParameters.Filter = $"appid eq '{id}'";
+                    requestConfiguration.QueryParameters.Filter = $"appid eq '{id}' or id eq '{id}'";
                     requestConfiguration.Headers.Add("ConsistencyLevel", "eventual");
                 });
             var app = sp?.Value;
@@ -164,7 +147,7 @@ public class GraphHelper
             }
             else
             {
-                return $"Deleted application {Helper.GetShortId(id)}";
+                return $"Deleted app {Helper.GetShortId(id)}";
             }
         }
         catch
@@ -270,17 +253,8 @@ public class GraphHelper
         }
 
         index = 1;
-        foreach (var id in servicePrincipalIds.Distinct())
-        {
-            if (Guid.TryParse(id, out _))
-            {
-                var name = _configOptions.IsManual == true || _configOptions.IsMaskServicePrincipal == true
-                    ? GetManualObjectName(id, index++, "Service Principal") : await GetServicePrincipalName(id);
-                directoryObjects.Add(id, name); //TODO use batch
-            }
-        }
-
-        foreach (var id in applicationIds.Distinct())
+        var appsp = servicePrincipalIds.Concat(applicationIds).Distinct();
+        foreach(var id in appsp)
         {
             if (Guid.TryParse(id, out _))
             {
@@ -292,7 +266,7 @@ public class GraphHelper
                 else
                 {
                     name = _configOptions.IsManual == true || _configOptions.IsMaskApplication == true
-                        ? GetManualObjectName(id, index++, "App") : await GetApplicationName(id);
+                        ? GetManualObjectName(id, index++, "App") : await GetAppName(id);
                 }
                 directoryObjects.Add(id, name); //TODO use batch
             }
