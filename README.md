@@ -10,6 +10,8 @@ The initial release of this app includes the Conditional Access Documenter which
 ## Support
 For issues, questions, and feature requests please use the Issues tab on this GitHub project. As this is a community project responses are on a best-effort basis.
 
+You can also join the [idPowerToys Discord Channel](https://discord.gg/DYzBtRJS63) at [https://discord.gg/DYzBtRJS63](https://discord.gg/DYzBtRJS63)
+
 ## Contributing
 
 This project welcomes contributions and suggestions.  
