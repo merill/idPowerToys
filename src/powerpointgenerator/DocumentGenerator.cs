@@ -8,12 +8,24 @@ public class DocumentGenerator
 {
     private GraphData _graphData = new(new ConfigOptions());
 
+    public void GeneratePowerPoint(GraphData graphData, Stream templateFile, Stream outputStream, ConfigOptions configOptions)
+    {
+        S.IPresentation pptxDoc = S.Presentation.Open(templateFile);
+        GeneratePowerPoint(graphData, pptxDoc, outputStream, configOptions);
+    }
+
     public void GeneratePowerPoint(GraphData graphData, string templateFilePath, Stream outputStream, ConfigOptions configOptions)
+    {
+        S.IPresentation pptxDoc = S.Presentation.Open(templateFilePath);
+        GeneratePowerPoint(graphData, pptxDoc, outputStream, configOptions);
+    }
+
+    public void GeneratePowerPoint(GraphData graphData, S.IPresentation pptxDoc, Stream outputStream, ConfigOptions configOptions)
     {
         _graphData = graphData;
         var policies = _graphData.Policies;
 
-        S.IPresentation pptxDoc = S.Presentation.Open(templateFilePath);
+        
 
         SetTitleSlideInfo(pptxDoc.Slides[0]);
         var templateSlide = pptxDoc.Slides[1];
