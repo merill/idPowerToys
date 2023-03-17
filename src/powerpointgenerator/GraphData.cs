@@ -1,7 +1,7 @@
-﻿using Microsoft.Kiota.Abstractions.Authentication;
-using System.Collections.Specialized;
+﻿using System.Collections.Specialized;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Microsoft.Kiota.Abstractions.Authentication;
 
 namespace IdPowerToys.PowerPointGenerator;
 
@@ -45,13 +45,23 @@ public class GraphData
     {
         if (ConfigOptions.ConditionalAccessPolicyJson == null) return;
 
-        JsonNode rootNode = JsonNode.Parse(ConfigOptions.ConditionalAccessPolicyJson)!;
-        JsonNode valueNode = rootNode!["value"]!;
-        var policyJson = valueNode.ToString();
-        Policies = JsonSerializer.Deserialize<List<ConditionalAccessPolicy>>(policyJson);
+        try
+        {
+            JsonNode rootNode = JsonNode.Parse(ConfigOptions.ConditionalAccessPolicyJson)!;
+            JsonNode valueNode = rootNode!["value"]!;
+            var policyJson = valueNode.ToString();
+            Policies = JsonSerializer.Deserialize<List<ConditionalAccessPolicy>>(policyJson, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+            });
 
-        var graph = new GraphHelper(ConfigOptions);
-        ObjectCache = await graph.GetDirectoryObjectCache(Policies);
+            var graph = new GraphHelper(ConfigOptions);
+            ObjectCache = await graph.GetDirectoryObjectCache(Policies);
+        }
+        catch (Exception ex)
+        {
+            throw;
+        }
     }
 }
 
