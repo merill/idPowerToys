@@ -57,19 +57,15 @@ public class GraphHelper
 
     public async Task<List<ConditionalAccessPolicy>?> GetPolicies()
     {
-        try
-        {
-            var policies = await _graph.Identity.ConditionalAccess.Policies.GetAsync();
+        var policies = await _graph.Policies.ConditionalAccessPolicies.GetAsync();
 
-            //var policies = await _graph.Policies.ConditionalAccessPolicies.GetAsync((requestConfiguration) =>
-            //{
-            //    requestConfiguration.QueryParameters.Filter = "id eq 'dd0766c1-aee7-44c4-b764-f611d66f374b'";
-            //    requestConfiguration.Headers.Add("ConsistencyLevel", "eventual");
-            //});
+        //var policies = await _graph.Policies.ConditionalAccessPolicies.GetAsync((requestConfiguration) =>
+        //{
+        //    requestConfiguration.QueryParameters.Filter = "id eq 'dd0766c1-aee7-44c4-b764-f611d66f374b'";
+        //    requestConfiguration.Headers.Add("ConsistencyLevel", "eventual");
+        //});
 
-            return policies?.Value;
-        }
-        catch { return null; }
+        return policies?.Value;
     }
 
     private string GetManualObjectName(string id, int index, string prefix)
@@ -185,7 +181,7 @@ public class GraphHelper
                     case BatchType.Tenant:
                         key = await batch.AddBatchRequestStepAsync(_graph.TenantRelationships.FindTenantInformationByTenantIdWithTenantId(obj.Id).ToGetRequestInformation()); break;
                 }
-                if(key != null) batchItems.Add(key, obj);
+                if (key != null) batchItems.Add(key, obj);
             }
         }
 
@@ -201,7 +197,7 @@ public class GraphHelper
             else
             {
                 string? name = null;
-                switch(obj.Type)
+                switch (obj.Type)
                 {
                     case BatchType.User:
                         var resUser = await responseBatch.GetResponseByIdAsync<User>(key); name = resUser.DisplayName;

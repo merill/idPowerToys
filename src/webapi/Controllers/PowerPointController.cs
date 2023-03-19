@@ -8,7 +8,6 @@ namespace webapi.Controllers;
 [Route("[controller]")]
 public class PowerPointController : ControllerBase
 {
-
     private readonly ILogger<PowerPointController> _logger;
     private readonly IWebHostEnvironment _hostEnvironment;
 
@@ -44,9 +43,7 @@ public class PowerPointController : ControllerBase
                 {
                     throw new Exception("Missing token in request");
                 }
-
             }
-
 
             Response.Clear();
             //Generate and stream doc
@@ -64,10 +61,10 @@ public class PowerPointController : ControllerBase
             _logger.LogInformation("ReturnFile");
             return File(stream, "application/octet-stream", "cadeck.pptx");
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             _logger.LogError(ex, "Generation error");
-            return StatusCode(500);
+            throw;
         }
     }
 }

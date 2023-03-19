@@ -7,7 +7,7 @@ namespace IdPowerToys.PowerPointGenerator;
 
 public class GraphData
 {
-    public ICollection<ConditionalAccessPolicy>? Policies { get; set; }
+    public List<ConditionalAccessPolicy>? Policies { get; set; }
     public StringDictionary? ObjectCache { get; set; }
     public StringDictionary? AuthenticationContexts { get; set; }
     public ICollection<Organization>? Organization { get; set; }

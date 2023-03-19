@@ -17,13 +17,13 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseExceptionHandler("/error-development");
 }
 else
 {
     app.UseHttpsRedirection();
+    app.UseExceptionHandler("/error");
 }
-
-app.UseAuthorization();
 
 app.MapControllers();
 
