@@ -1,6 +1,6 @@
 ﻿using Microsoft.Graph;
 
-namespace IdPowerToys.PowerPointGenerator;
+namespace IdPowerToys.PowerPointGenerator.Graph;
 
 public static class DirectoryRoles
 {

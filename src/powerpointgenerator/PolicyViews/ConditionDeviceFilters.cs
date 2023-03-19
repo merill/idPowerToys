@@ -1,4 +1,6 @@
-﻿namespace IdPowerToys.PowerPointGenerator.PolicyViews;
+﻿using IdPowerToys.PowerPointGenerator.Graph;
+
+namespace IdPowerToys.PowerPointGenerator.PolicyViews;
 
 public class ConditionDeviceFilters : PolicyView
 {

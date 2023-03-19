@@ -1,6 +1,6 @@
 ﻿using System.Collections.Specialized;
 
-namespace IdPowerToys.PowerPointGenerator;
+namespace IdPowerToys.PowerPointGenerator.Infrastructure;
 
 public static class Helper
 {
@@ -20,7 +20,7 @@ public static class Helper
         }
         else
         {
-            if(Guid.TryParse(id, out _))
+            if (Guid.TryParse(id, out _))
             {
                 var shortId = GetShortId(id);
                 name = prefix == null ? shortId : $"{prefix} ({shortId})";
@@ -30,7 +30,6 @@ public static class Helper
                 name = id;
             }
         }
-        
 
         return name;
     }

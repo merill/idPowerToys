@@ -1,4 +1,5 @@
 using IdPowerToys.PowerPointGenerator;
+using IdPowerToys.PowerPointGenerator.Graph;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 
@@ -9,12 +10,10 @@ namespace webapi.Controllers;
 public class PowerPointController : ControllerBase
 {
     private readonly ILogger<PowerPointController> _logger;
-    private readonly IWebHostEnvironment _hostEnvironment;
 
-    public PowerPointController(ILogger<PowerPointController> logger, IWebHostEnvironment hostEnvironment)
+    public PowerPointController(ILogger<PowerPointController> logger)
     {
         _logger = logger;
-        _hostEnvironment = hostEnvironment;
     }
 
     [HttpPost]
@@ -50,12 +49,10 @@ public class PowerPointController : ControllerBase
             Response.ContentType = "application/octet-stream";
             Response.Headers.Add("Content-Disposition", "attachment; filename=\"Conditional Access Policies.pptx\"");
 
-            var templateFilePath = Path.Combine(_hostEnvironment.ContentRootPath, @"wwwroot/assets/PolicyTemplate.pptx");
-
             var gen = new DocumentGenerator();
             var stream = new MemoryStream();
             _logger.LogInformation("GeneratePowerPoint");
-            gen.GeneratePowerPoint(graphData, templateFilePath, stream, configOptions);
+            gen.GeneratePowerPoint(graphData, stream, configOptions);
             stream.Position = 0;
 
             _logger.LogInformation("ReturnFile");

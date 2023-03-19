@@ -3,7 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using Microsoft.Kiota.Abstractions.Authentication;
 
-namespace IdPowerToys.PowerPointGenerator;
+namespace IdPowerToys.PowerPointGenerator.Graph;
 
 public class GraphData
 {
@@ -22,7 +22,7 @@ public class GraphData
     public async Task CollectData(string accessToken)
     {
         var tokenProvider = new TokenProvider();
-        tokenProvider.AccessToken= accessToken;
+        tokenProvider.AccessToken = accessToken;
         var accessTokenProvider = new BaseBearerTokenAuthenticationProvider(tokenProvider);
 
         var graphClient = new GraphServiceClient(accessTokenProvider, "https://graph.microsoft.com/beta");
@@ -69,7 +69,7 @@ public class GraphData
 public class TokenProvider : IAccessTokenProvider
 {
     public string? AccessToken { get; set; }
-    
+
     public Task<string> GetAuthorizationTokenAsync(Uri uri, Dictionary<string, object>? additionalAuthenticationContext = default,
         CancellationToken cancellationToken = default)
     {

@@ -7,6 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Assets\PolicyTemplate.pptx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\PolicyTemplate.pptx">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Graph.Beta" Version="5.22.0-preview" />
     <PackageReference Include="Syncfusion.Presentation.Net.Core" Version="20.4.0.54" />
   </ItemGroup>

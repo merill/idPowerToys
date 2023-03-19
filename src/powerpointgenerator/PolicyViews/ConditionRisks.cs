@@ -1,4 +1,5 @@
-﻿using IdPowerToys.PowerPointGenerator.PolicyViews;
+﻿using IdPowerToys.PowerPointGenerator.Graph;
+using IdPowerToys.PowerPointGenerator.PolicyViews;
 
 namespace IdPowerToys.PowerPointGenerator;
 

@@ -1,4 +1,7 @@
-﻿namespace IdPowerToys.PowerPointGenerator.PolicyViews;
+﻿using IdPowerToys.PowerPointGenerator.Graph;
+using IdPowerToys.PowerPointGenerator.Infrastructure;
+
+namespace IdPowerToys.PowerPointGenerator.PolicyViews;
 
 public enum AppAccessType
 {

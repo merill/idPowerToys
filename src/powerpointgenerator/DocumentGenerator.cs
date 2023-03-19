@@ -1,12 +1,22 @@
-﻿using S=Syncfusion.Presentation;
+﻿using S = Syncfusion.Presentation;
 using System.Text.Json;
 using IdPowerToys.PowerPointGenerator.PolicyViews;
+using IdPowerToys.PowerPointGenerator.Graph;
+using System.Reflection;
 
 namespace IdPowerToys.PowerPointGenerator;
 
 public class DocumentGenerator
 {
     private GraphData _graphData = new(new ConfigOptions());
+
+    public void GeneratePowerPoint(GraphData graphData, Stream outputStream, ConfigOptions configOptions)
+    {
+        Stream templateStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("IdPowerToys.PowerPointGenerator.Assets.PolicyTemplate.pptx");
+
+        S.IPresentation pptxDoc = S.Presentation.Open(templateStream);
+        GeneratePowerPoint(graphData, pptxDoc, outputStream, configOptions);
+    }
 
     public void GeneratePowerPoint(GraphData graphData, Stream templateFile, Stream outputStream, ConfigOptions configOptions)
     {
