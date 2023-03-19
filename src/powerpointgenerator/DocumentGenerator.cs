@@ -3,6 +3,7 @@ using System.Text.Json;
 using IdPowerToys.PowerPointGenerator.PolicyViews;
 using IdPowerToys.PowerPointGenerator.Graph;
 using System.Reflection;
+using Syncfusion.Presentation;
 
 namespace IdPowerToys.PowerPointGenerator;
 
@@ -10,6 +11,7 @@ public class DocumentGenerator
 {
     private GraphData _graphData = new(new ConfigOptions());
 
+    #region GeneratePowerPoint overloads
     public void GeneratePowerPoint(GraphData graphData, Stream outputStream, ConfigOptions configOptions)
     {
         Stream templateStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("IdPowerToys.PowerPointGenerator.Assets.PolicyTemplate.pptx");
@@ -29,6 +31,7 @@ public class DocumentGenerator
         S.IPresentation pptxDoc = S.Presentation.Open(templateFilePath);
         GeneratePowerPoint(graphData, pptxDoc, outputStream, configOptions);
     }
+    #endregion
 
     public void GeneratePowerPoint(GraphData graphData, S.IPresentation pptxDoc, Stream outputStream, ConfigOptions configOptions)
     {
@@ -103,11 +106,35 @@ public class DocumentGenerator
         var policyName = policy.DisplayName;
         if (_graphData.ConfigOptions.IsMaskPolicy == true)
         {
-            policyName = GetPolicyName(policy, index, assignedUserWorkload, assignedCloudAppAction,
-                conditionClientAppTypes, conditionDeviceFilters, conditionLocations,
-                conditionPlatforms, conditionRisks, grantControls, sessionControls);
+            policyName = GetPolicyName(index, assignedUserWorkload, assignedCloudAppAction, grantControls);
         }
 
+        SetHeader(policy, ppt, policyName);
+
+        SetUserWorkload(assignedUserWorkload, ppt);
+
+        SetCloudApps(assignedCloudAppAction, ppt);
+
+        SetConditions(conditionClientAppTypes, conditionDeviceFilters, conditionLocations, conditionPlatforms, conditionRisks, ppt);
+
+        SetGrantControls(grantControls, ppt);
+
+        SetSessionControls(policy, sessionControls, ppt);
+
+        SetNotes(slide, policy, policyName);
+    }
+
+    private void SetNotes(ISlide slide, ConditionalAccessPolicy policy, string? policyName)
+    {
+        var json = JsonSerializer.Serialize(policy, new JsonSerializerOptions { WriteIndented = true });
+        var notes = slide.AddNotesSlide();
+        notes.NotesTextBody.AddParagraph(policyName);
+        notes.NotesTextBody.AddParagraph("Portal link: " + GetPolicyPortalLink(policy));
+        notes.NotesTextBody.AddParagraph(json);
+    }
+
+    private void SetHeader(ConditionalAccessPolicy policy, PowerPointHelper ppt, string? policyName)
+    {
         ppt.SetText(Shape.PolicyName, policyName);
         ppt.SetLink(Shape.PolicyName, GetPolicyPortalLink(policy));
         ppt.Show(policy.State == ConditionalAccessPolicyState.Enabled, Shape.StateEnabled);
@@ -115,14 +142,20 @@ public class DocumentGenerator
         ppt.Show(policy.State == ConditionalAccessPolicyState.EnabledForReportingButNotEnforced, Shape.StateReportOnly);
         string lastModified = GetLastModified(policy);
         ppt.SetText(Shape.LastModified, lastModified);
+    }
 
+    private static void SetUserWorkload(AssignedUserWorkload assignedUserWorkload, PowerPointHelper ppt)
+    {
         ppt.SetText(Shape.UserWorkload, assignedUserWorkload.Name);
         ppt.SetTextFormatted(Shape.UserWorkloadIncExc, assignedUserWorkload.IncludeExclude);
         ppt.Show(assignedUserWorkload.IsWorkload, Shape.IconWorkloadIdentity);
         ppt.Show(!assignedUserWorkload.IsWorkload, Shape.IconGroupIdentity);
         ppt.Show(assignedUserWorkload.HasIncludeRoles, Shape.IconAssignedToRole);
         ppt.Show(assignedUserWorkload.HasIncludeExternalUser || assignedUserWorkload.HasIncludeExternalTenant, Shape.IconAssignedToGuest);
+    }
 
+    private static void SetCloudApps(AssignedCloudAppAction assignedCloudAppAction, PowerPointHelper ppt)
+    {
         ppt.SetText(Shape.CloudAppAction, assignedCloudAppAction.Name);
         ppt.SetTextFormatted(Shape.CloudAppActionIncExc, assignedCloudAppAction.IncludeExclude);
         ppt.Show(assignedCloudAppAction.HasData && !assignedCloudAppAction.IsSelectedAppO365Only, Shape.CloudAppActionIncExc);
@@ -140,8 +173,10 @@ public class DocumentGenerator
             Shape.IconAccessAuthenticationContext);
         ppt.Show(assignedCloudAppAction.AccessType == AppAccessType.AppsNone,
             Shape.IconAccessAzureAD);
+    }
 
-
+    private static void SetConditions(ConditionClientAppTypes conditionClientAppTypes, ConditionDeviceFilters conditionDeviceFilters, ConditionLocations conditionLocations, ConditionPlatforms conditionPlatforms, ConditionRisks conditionRisks, PowerPointHelper ppt)
+    {
         if (conditionRisks.HasData) ppt.SetTextFormatted(Shape.Risks, conditionRisks.IncludeExclude);
         ppt.Show(!conditionRisks.HasData, Shape.ShadeRisk);
 
@@ -156,8 +191,33 @@ public class DocumentGenerator
 
         if (conditionDeviceFilters.HasData) ppt.SetTextFormatted(Shape.DeviceFilters, conditionDeviceFilters.IncludeExclude);
         ppt.Show(!conditionDeviceFilters.HasData, Shape.ShadeFilterForDevices);
+    }
 
+    private static void SetSessionControls(ConditionalAccessPolicy policy, ControlSession sessionControls, PowerPointHelper ppt)
+    {
+        ppt.Show(!sessionControls.UseAppEnforcedRestrictions, Shape.ShadeSessionAppEnforced);
+        ppt.Show(!sessionControls.UseConditionalAccessAppControl, Shape.ShadeSessionCas);
+        ppt.SetText(Shape.SessionCasType, sessionControls.CloudAppSecurityType);
+        ppt.Show(!sessionControls.SignInFrequency, Shape.ShadeSessionSif);
+        ppt.SetText(Shape.SessionSifInterval, sessionControls.SignInFrequencyIntervalLabel);
+        ppt.Show(!sessionControls.PersistentBrowserSession, Shape.ShadeSessionPersistentBrowser);
+        ppt.SetText(Shape.SessionPersistenBrowserMode, sessionControls.PersistentBrowserSessionModeLabel);
+        ppt.Show(!sessionControls.ContinousAccessEvaluation, Shape.ShadeSessionCae);
+        if (sessionControls.ContinousAccessEvaluation)
+        {
+            ppt.SetText(Shape.SessionCaeMode, sessionControls.ContinousAccessEvaluationModeLabel);
+            if (policy.SessionControls?.ContinuousAccessEvaluation != null)
+            {
+                ppt.Show(policy.SessionControls.ContinuousAccessEvaluation.Mode == ContinuousAccessEvaluationMode.Disabled, Shape.IconSessionCaeDisable);
+            }
 
+        }
+        ppt.Show(!sessionControls.DisableResilienceDefaults, Shape.ShadeSessionDisableResilience);
+        ppt.Show(!sessionControls.SecureSignInSession, Shape.ShadeSessionSecureSignIn);
+    }
+
+    private static void SetGrantControls(ControlGrantBlock grantControls, PowerPointHelper ppt)
+    {
         ppt.SetText(Shape.IconGrantCustomAuthLabel, grantControls.CustomAuthenticationFactorName);
         ppt.SetText(Shape.IconGrantTermsOfUseLabel, grantControls.TermsOfUseName);
         ppt.SetText(Shape.IconGrantAuthenticationStrengthLabel, grantControls.AuthenticationStrengthName);
@@ -177,33 +237,6 @@ public class DocumentGenerator
         ppt.Show(!grantControls.DomainJoinedDevice, Shape.ShadeGrantHybridAzureADJoined);
         ppt.Show(!grantControls.Mfa, Shape.ShadeGrantMultifactorAuth);
         ppt.Show(!grantControls.PasswordChange, Shape.ShadeGrantChangePassword);
-
-
-        ppt.Show(!sessionControls.UseAppEnforcedRestrictions, Shape.ShadeSessionAppEnforced);
-        ppt.Show(!sessionControls.UseConditionalAccessAppControl, Shape.ShadeSessionCas);
-        ppt.SetText(Shape.SessionCasType, sessionControls.CloudAppSecurityType);
-        ppt.Show(!sessionControls.SignInFrequency, Shape.ShadeSessionSif);
-        ppt.SetText(Shape.SessionSifInterval, sessionControls.SignInFrequencyIntervalLabel);
-        ppt.Show(!sessionControls.PersistentBrowserSession, Shape.ShadeSessionPersistentBrowser);
-        ppt.SetText(Shape.SessionPersistenBrowserMode, sessionControls.PersistentBrowserSessionModeLabel);
-        ppt.Show(!sessionControls.ContinousAccessEvaluation, Shape.ShadeSessionCae);
-        if (sessionControls.ContinousAccessEvaluation)
-        {
-            ppt.SetText(Shape.SessionCaeMode, sessionControls.ContinousAccessEvaluationModeLabel);
-            if(policy.SessionControls?.ContinuousAccessEvaluation != null)
-            {
-                ppt.Show(policy.SessionControls.ContinuousAccessEvaluation.Mode == ContinuousAccessEvaluationMode.Disabled, Shape.IconSessionCaeDisable);
-            }
-            
-        }
-        ppt.Show(!sessionControls.DisableResilienceDefaults, Shape.ShadeSessionDisableResilience);
-        ppt.Show(!sessionControls.SecureSignInSession, Shape.ShadeSessionSecureSignIn);
-
-        var json = JsonSerializer.Serialize(policy, new JsonSerializerOptions { WriteIndented = true });
-        var notes = slide.AddNotesSlide();
-        notes.NotesTextBody.AddParagraph(policyName);
-        notes.NotesTextBody.AddParagraph("Portal link: " + GetPolicyPortalLink(policy));
-        notes.NotesTextBody.AddParagraph(json);
     }
 
     private static string GetLastModified(ConditionalAccessPolicy policy)
@@ -216,7 +249,7 @@ public class DocumentGenerator
         return dateValue;
     }
 
-    private string GetPolicyName(ConditionalAccessPolicy policy, int index, AssignedUserWorkload assignedUserWorkload, AssignedCloudAppAction assignedCloudAppAction, ConditionClientAppTypes conditionClientAppTypes, ConditionDeviceFilters conditionDeviceFilters, ConditionLocations conditionLocations, ConditionPlatforms conditionPlatforms, ConditionRisks conditionRisks, ControlGrantBlock grantControls, ControlSession sessionControls)
+    private string GetPolicyName(int index, AssignedUserWorkload assignedUserWorkload, AssignedCloudAppAction assignedCloudAppAction, ControlGrantBlock grantControls)
     {
         var sb = new StringBuilder("CA");
         sb.Append(index.ToString("000"));
@@ -225,7 +258,7 @@ public class DocumentGenerator
         return sb.ToString();
     }
 
-    private void SetTitleSlideInfo(S.ISlide slide)
+    private void SetTitleSlideInfo(ISlide slide)
     {
         var ppt = new PowerPointHelper(slide);
         if (_graphData.Organization != null && _graphData.Organization.Count > 0)
