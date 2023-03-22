@@ -3,6 +3,7 @@ using System.Diagnostics;
 using IdPowerToys.PowerPointGenerator;
 using System.Reflection;
 using ConditionalAccessDocumenter.Properties;
+using IdPowerToys.PowerPointGenerator.Graph;
 
 namespace ConditionalAccessDocumenter
 {
@@ -137,9 +138,19 @@ namespace ConditionalAccessDocumenter
         {
             try
             {
-                if (!loggedIn)
+                bool isManual = !string.IsNullOrEmpty(txtManualCaPolicy.Text);
+                string token = string.Empty;
+                var configOptions = new ConfigOptions();
+
+                if (isManual)
+                {
+                    configOptions.IsManual = true;
+                    configOptions.ConditionalAccessPolicyJson = txtManualCaPolicy.Text;
+                }
+                else if (!loggedIn)
                 {
                     await DoLogin();
+                    token = await GetAccessToken();
                 }
 
                 SaveSettings();
@@ -148,11 +159,16 @@ namespace ConditionalAccessDocumenter
                 lblStatus.Visible = false;
                 Application.DoEvents();
 
-                var configOptions = new ConfigOptions();
-                var token = await GetAccessToken();
                 var graphData = new GraphData(configOptions);
 
-                await graphData.CollectData(token);
+                if (configOptions.IsManual == true)
+                {
+                    await graphData.ImportPolicy();
+                }
+                else
+                {
+                    await graphData.CollectData(token);
+                }
 
                 Stream templateStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("ConditionalAccessDocumenter.Assets.PolicyTemplate.pptx");
 
@@ -177,7 +193,7 @@ namespace ConditionalAccessDocumenter
                 btnGenerate.Enabled = true;
                 Application.DoEvents();
 
-                MessageBox.Show("An error occured. " + ex.Message, "Error", MessageBoxButtons.OKCancel, MessageBoxIcon.Error);
+                MessageBox.Show("An error occured. " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

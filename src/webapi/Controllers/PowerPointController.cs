@@ -16,6 +16,30 @@ public class PowerPointController : ControllerBase
         _logger = logger;
     }
 
+    //[HttpGet] 
+    //public async Task<string> Get()
+    //{
+    //    var accessToken = "";
+    //    //var tokenProvider = new TokenProvider();
+    //    //tokenProvider.AccessToken = accessToken;
+    //    //var accessTokenProvider = new BaseBearerTokenAuthenticationProvider(tokenProvider);
+
+    //    //var graphClient = new GraphServiceClient(accessTokenProvider, "https://graph.microsoft.com/beta");
+    //    //var policies = await graphClient.Policies.ConditionalAccessPolicies.GetAsync();
+
+    //    string json = "";
+
+    //    using (HttpClient client2 = new HttpClient())
+    //    {
+    //        client2.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
+    //        var currentUserResult = await client2.GetAsync($"https://graph.microsoft.com/beta/policies/conditionalAccessPolicies");
+    //        json = await currentUserResult.Content.ReadAsStringAsync().ConfigureAwait(false);
+    //    }
+    //    var polful = JsonSerializer.Deserialize<ConditionalAccessPolicyCollectionResponse>(json);
+
+    //    return json;
+    //}
+
     [HttpPost]
     public async Task<IActionResult> Post(ConfigOptions configOptions)
     {

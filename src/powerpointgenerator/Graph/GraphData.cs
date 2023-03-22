@@ -2,6 +2,7 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Microsoft.Kiota.Abstractions.Authentication;
+using Microsoft.Kiota.Serialization.Json;
 
 namespace IdPowerToys.PowerPointGenerator.Graph;
 
@@ -47,13 +48,18 @@ public class GraphData
 
         try
         {
-            JsonNode rootNode = JsonNode.Parse(ConfigOptions.ConditionalAccessPolicyJson)!;
-            JsonNode valueNode = rootNode!["value"]!;
-            var policyJson = valueNode.ToString();
-            Policies = JsonSerializer.Deserialize<List<ConditionalAccessPolicy>>(policyJson, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-            });
+            //JsonNode rootNode = JsonNode.Parse(ConfigOptions.ConditionalAccessPolicyJson)!;
+            //JsonNode valueNode = rootNode!["value"]!;
+            //var policyJson = valueNode.ToString();
+            //Policies = JsonSerializer.Deserialize<List<ConditionalAccessPolicy>>(policyJson, new JsonSerializerOptions
+            //{
+            //    PropertyNameCaseInsensitive = true,
+            //});
+
+            var jsonRootElement = JsonDocument.Parse(ConfigOptions.ConditionalAccessPolicyJson).RootElement; 
+            var collectionElement = jsonRootElement.GetProperty("value"); 
+            var jsonParseNode = new JsonParseNode(collectionElement); 
+            Policies = jsonParseNode.GetCollectionOfObjectValues<ConditionalAccessPolicy>(ConditionalAccessPolicy.CreateFromDiscriminatorValue).ToList();
 
             var graph = new GraphHelper(ConfigOptions);
             ObjectCache = await graph.GetDirectoryObjectCache(Policies);

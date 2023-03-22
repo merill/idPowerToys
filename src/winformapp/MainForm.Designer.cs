@@ -47,7 +47,9 @@
             txtClientId = new TextBox();
             label2 = new Label();
             label6 = new Label();
+            tabPage3 = new TabPage();
             btnSignIn = new Button();
+            txtManualCaPolicy = new RichTextBox();
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
             tabPage2.SuspendLayout();
@@ -86,6 +88,7 @@
             // 
             tabControl1.Controls.Add(tabPage1);
             tabControl1.Controls.Add(tabPage2);
+            tabControl1.Controls.Add(tabPage3);
             tabControl1.Location = new Point(48, 177);
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
@@ -94,6 +97,7 @@
             // 
             // tabPage1
             // 
+            tabPage1.Controls.Add(txtManualCaPolicy);
             tabPage1.Controls.Add(lblStatus);
             tabPage1.Controls.Add(progressBar);
             tabPage1.Controls.Add(label7);
@@ -230,6 +234,16 @@
             label6.TabIndex = 12;
             label6.Text = resources.GetString("label6.Text");
             // 
+            // tabPage3
+            // 
+            tabPage3.Location = new Point(8, 46);
+            tabPage3.Name = "tabPage3";
+            tabPage3.Padding = new Padding(3);
+            tabPage3.Size = new Size(1080, 525);
+            tabPage3.TabIndex = 2;
+            tabPage3.Text = "Manual Generation";
+            tabPage3.UseVisualStyleBackColor = true;
+            // 
             // btnSignIn
             // 
             btnSignIn.Location = new Point(994, 97);
@@ -239,6 +253,14 @@
             btnSignIn.Text = "&Sign In";
             btnSignIn.UseVisualStyleBackColor = true;
             btnSignIn.Click += btnSignIn_Click;
+            // 
+            // txtManualCaPolicy
+            // 
+            txtManualCaPolicy.Location = new Point(513, 277);
+            txtManualCaPolicy.Name = "txtManualCaPolicy";
+            txtManualCaPolicy.Size = new Size(514, 192);
+            txtManualCaPolicy.TabIndex = 22;
+            txtManualCaPolicy.Text = "";
             // 
             // MainForm
             // 
@@ -284,5 +306,7 @@
         private TextBox txtClientId;
         private Label label2;
         private Label lblStatus;
+        private TabPage tabPage3;
+        private RichTextBox txtManualCaPolicy;
     }
 }

@@ -42,8 +42,7 @@ export const CaDocGenManual = () => {
     return (
         <>
             <div className={styles.base}>
-                <p><b>NOTE: THE MANUAL MODE IS TEMPORARILY NOT AVAILABLE WHILE A BUG IS BEING FIXED.</b></p>
-                <p>Use one of the options below to manually generate the documentation without signing into idPowerToys.</p>
+                <p>Use this option to manually generate the documentation without signing into idPowerToys.</p>
                 <p>Documentation generated manually will not include the names of users, apps and other directory objects.</p>
 
                 <Accordion collapsible={true}>
@@ -82,7 +81,7 @@ export const CaDocGenManual = () => {
                     onChange={(e) => setCaPolicyJson(e.target.value)}
                 />
             </div>
-            {/* <CaDocGenButton isManual={true} caPolicyJson={caPolicyJson}  /> */}
+            <CaDocGenButton isManual={true} caPolicyJson={caPolicyJson}  />
         </>
     );
 };

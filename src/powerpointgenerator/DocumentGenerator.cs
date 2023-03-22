@@ -1,5 +1,4 @@
-﻿using S = Syncfusion.Presentation;
-using System.Text.Json;
+﻿using System.Text.Json;
 using IdPowerToys.PowerPointGenerator.PolicyViews;
 using IdPowerToys.PowerPointGenerator.Graph;
 using System.Reflection;
@@ -16,24 +15,24 @@ public class DocumentGenerator
     {
         Stream templateStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("IdPowerToys.PowerPointGenerator.Assets.PolicyTemplate.pptx");
 
-        S.IPresentation pptxDoc = S.Presentation.Open(templateStream);
+        IPresentation pptxDoc = Syncfusion.Presentation.Presentation.Open(templateStream);
         GeneratePowerPoint(graphData, pptxDoc, outputStream, configOptions);
     }
 
     public void GeneratePowerPoint(GraphData graphData, Stream templateFile, Stream outputStream, ConfigOptions configOptions)
     {
-        S.IPresentation pptxDoc = S.Presentation.Open(templateFile);
+        IPresentation pptxDoc = Syncfusion.Presentation.Presentation.Open(templateFile);
         GeneratePowerPoint(graphData, pptxDoc, outputStream, configOptions);
     }
 
     public void GeneratePowerPoint(GraphData graphData, string templateFilePath, Stream outputStream, ConfigOptions configOptions)
     {
-        S.IPresentation pptxDoc = S.Presentation.Open(templateFilePath);
+        IPresentation pptxDoc = Syncfusion.Presentation.Presentation.Open(templateFilePath);
         GeneratePowerPoint(graphData, pptxDoc, outputStream, configOptions);
     }
     #endregion
 
-    public void GeneratePowerPoint(GraphData graphData, S.IPresentation pptxDoc, Stream outputStream, ConfigOptions configOptions)
+    public void GeneratePowerPoint(GraphData graphData, IPresentation pptxDoc, Stream outputStream, ConfigOptions configOptions)
     {
         _graphData = graphData;
         var policies = _graphData.Policies;
@@ -61,7 +60,7 @@ public class DocumentGenerator
         pptxDoc.Close();
     }
 
-    private void AddSlides(S.IPresentation pptxDoc, ICollection<ConditionalAccessPolicy> policies, string? sectionTitle, ConditionalAccessPolicyState? policyState)
+    private void AddSlides(IPresentation pptxDoc, ICollection<ConditionalAccessPolicy> policies, string? sectionTitle, ConditionalAccessPolicyState? policyState)
     {
         var filteredPolicies = policyState == null
             ? from p in policies orderby p.DisplayName select p
@@ -87,7 +86,7 @@ public class DocumentGenerator
         }
     }
 
-    private void SetPolicySlideInfo(S.ISlide slide, ConditionalAccessPolicy policy, int index)
+    private void SetPolicySlideInfo(ISlide slide, ConditionalAccessPolicy policy, int index)
     {
         var assignedUserWorkload = new AssignedUserWorkload(policy, _graphData);
         var assignedCloudAppAction = new AssignedCloudAppAction(policy, _graphData);
@@ -126,7 +125,8 @@ public class DocumentGenerator
 
     private void SetNotes(ISlide slide, ConditionalAccessPolicy policy, string? policyName)
     {
-        var json = JsonSerializer.Serialize(policy, new JsonSerializerOptions { WriteIndented = true });
+        var json = JsonSerializer.Serialize<ConditionalAccessPolicy>(policy, new JsonSerializerOptions { WriteIndented = true });
+
         var notes = slide.AddNotesSlide();
         notes.NotesTextBody.AddParagraph(policyName);
         notes.NotesTextBody.AddParagraph("Portal link: " + GetPolicyPortalLink(policy));

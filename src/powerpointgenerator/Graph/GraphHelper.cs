@@ -112,12 +112,12 @@ public class GraphHelper
             }
         }
 
-        await AddBatch(directoryObjects, dirObjects);
-        await AddGroupsCount(directoryObjects, groupIds);
-        await AddRoles(directoryObjects, roleIds);
-
         if (_configOptions.IsManual != true)
         {
+            await AddBatch(directoryObjects, dirObjects);
+            await AddGroupsCount(directoryObjects, groupIds);
+            await AddRoles(directoryObjects, roleIds);
+
             await AddAgreements(directoryObjects, maskTermsOfUse);
             await AddNamedLocations(directoryObjects, maskNamedLocation);
         }
