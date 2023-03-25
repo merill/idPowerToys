@@ -125,8 +125,8 @@ public class DocumentGenerator
 
     private void SetNotes(ISlide slide, ConditionalAccessPolicy policy, string? policyName)
     {
-        var json = JsonSerializer.Serialize<ConditionalAccessPolicy>(policy, new JsonSerializerOptions { WriteIndented = true });
 
+        var json = _graphData.GetJsonFromPolicy(policy);
         var notes = slide.AddNotesSlide();
         notes.NotesTextBody.AddParagraph(policyName);
         notes.NotesTextBody.AddParagraph("Portal link: " + GetPolicyPortalLink(policy));

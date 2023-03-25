@@ -1,6 +1,8 @@
 ﻿using System.Collections.Specialized;
+using System.IO;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Azure.Core;
 using Microsoft.Kiota.Abstractions.Authentication;
 using Microsoft.Kiota.Serialization.Json;
 
@@ -14,60 +16,81 @@ public class GraphData
     public ICollection<Organization>? Organization { get; set; }
     public User? Me { get; set; }
     public ConfigOptions ConfigOptions { get; private set; }
+    private GraphHelper _graphHelper;
 
-    public GraphData(ConfigOptions configOptions)
+    public GraphData(ConfigOptions configOptions) //Manual generation
     {
         ConfigOptions = configOptions;
+        _graphHelper = new GraphHelper(configOptions);
     }
 
-    public async Task CollectData(string accessToken)
+    public GraphData(ConfigOptions configOptions, string accessToken) //Web API call
+    {
+        ConfigOptions = configOptions;
+        var graphClient = GetGraphClientUsingAccessToken(accessToken);
+        _graphHelper = new GraphHelper(graphClient, configOptions);
+    }
+
+    public GraphData(ConfigOptions configOptions, GraphHelper graphHelper) //Desktop app
+    {
+        ConfigOptions = configOptions;
+        _graphHelper = graphHelper;
+    }
+
+    public async Task CollectData()
+    {
+        if (ConfigOptions.IsManual == true)
+        {
+            _graphHelper = new GraphHelper(ConfigOptions);
+            SetPolicyFromJson(ConfigOptions.ConditionalAccessPolicyJson);
+        }
+        else
+        {
+            //TODO: Batch and call in parallel to improve perf
+            Me = await _graphHelper.GetMe();
+            Organization = await _graphHelper.GetOrganization();
+            Policies = await _graphHelper.GetPolicies();
+            AuthenticationContexts = await _graphHelper.GetAuthenticationContexts();
+        }
+        ObjectCache = await _graphHelper.GetDirectoryObjectCache(Policies);
+    }
+
+    private GraphServiceClient GetGraphClientUsingAccessToken(string accessToken)
     {
         var tokenProvider = new TokenProvider();
         tokenProvider.AccessToken = accessToken;
         var accessTokenProvider = new BaseBearerTokenAuthenticationProvider(tokenProvider);
 
         var graphClient = new GraphServiceClient(accessTokenProvider, "https://graph.microsoft.com/beta");
-
-        var graphHelper = new GraphHelper(graphClient, ConfigOptions);
-
-        await CollectData(graphHelper);
-    }
-    public async Task CollectData(GraphHelper graph)
-    {
-        //TODO: Batch and call in parallel to improve perf
-        Me = await graph.GetMe();
-        Organization = await graph.GetOrganization();
-        Policies = await graph.GetPolicies();
-        ObjectCache = await graph.GetDirectoryObjectCache(Policies);
-        AuthenticationContexts = await graph.GetAuthenticationContexts();
+        return graphClient;
     }
 
-    public async Task ImportPolicy()
+    public void SetPolicyFromJson(string? caPolicyJson)
     {
-        if (ConfigOptions.ConditionalAccessPolicyJson == null) return;
-
-        try
+        if (caPolicyJson == null)
         {
-            //JsonNode rootNode = JsonNode.Parse(ConfigOptions.ConditionalAccessPolicyJson)!;
-            //JsonNode valueNode = rootNode!["value"]!;
-            //var policyJson = valueNode.ToString();
-            //Policies = JsonSerializer.Deserialize<List<ConditionalAccessPolicy>>(policyJson, new JsonSerializerOptions
-            //{
-            //    PropertyNameCaseInsensitive = true,
-            //});
-
-            var jsonRootElement = JsonDocument.Parse(ConfigOptions.ConditionalAccessPolicyJson).RootElement; 
-            var collectionElement = jsonRootElement.GetProperty("value"); 
-            var jsonParseNode = new JsonParseNode(collectionElement); 
-            Policies = jsonParseNode.GetCollectionOfObjectValues<ConditionalAccessPolicy>(ConditionalAccessPolicy.CreateFromDiscriminatorValue).ToList();
-
-            var graph = new GraphHelper(ConfigOptions);
-            ObjectCache = await graph.GetDirectoryObjectCache(Policies);
+            throw new Exception("Conditional Access Policy Json was not provided.");
         }
-        catch (Exception ex)
-        {
-            throw;
-        }
+
+        var jsonRootElement = JsonDocument.Parse(ConfigOptions.ConditionalAccessPolicyJson).RootElement;
+        var collectionElement = jsonRootElement.GetProperty("value");
+        var jsonParseNode = new JsonParseNode(collectionElement);
+        Policies = jsonParseNode.GetCollectionOfObjectValues<ConditionalAccessPolicy>(ConditionalAccessPolicy.CreateFromDiscriminatorValue).ToList();
+    }
+
+    public string GetJsonFromPolicy(ConditionalAccessPolicy policy)
+    {
+        //Use standard serialization for now.
+        return JsonSerializer.Serialize<ConditionalAccessPolicy>(policy, new JsonSerializerOptions { WriteIndented = true });
+        
+        //var seralizer = _graphHelper.GraphServiceClient.RequestAdapter.SerializationWriterFactory.GetSerializationWriter("application/json");
+        //seralizer.WriteObjectValue(string.Empty, policy);
+        //var serializedContent = seralizer.GetSerializedContent();
+
+        //using (var sr = new StreamReader(serializedContent))
+        //{
+        //    return sr.ReadToEnd();
+        //}
     }
 }
 

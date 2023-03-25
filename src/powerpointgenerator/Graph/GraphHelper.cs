@@ -1,6 +1,7 @@
 ﻿using System.Collections.Specialized;
 using IdPowerToys.PowerPointGenerator.Infrastructure;
 using Microsoft.Graph;
+using Microsoft.Graph.Beta;
 
 namespace IdPowerToys.PowerPointGenerator.Graph;
 
