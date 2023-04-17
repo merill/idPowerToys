@@ -5,6 +5,7 @@ import Home from "./pages/Home";
 import About from "./pages/About";
 import NoPage from "./pages/NoPage";
 import PageCaDocHome from "./pages/ca/Home"
+import PageMindMapHome from "./pages/mindmap/Home"
 import { envConfig } from "./authConfig"
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
                 <Route path="/" element={<PageLayout />}>
                     <Route index element={<Home />} />
                     <Route path="/ca" element={<PageCaDocHome />} />
+                    <Route path="/mindmap" element={<PageMindMapHome />} />
                     <Route path="*" element={<NoPage />} />
                     <Route path="/about" element={<About />} />
                 </Route>
