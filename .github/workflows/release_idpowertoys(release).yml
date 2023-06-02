@@ -46,6 +46,9 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: .net-app
+      - uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
@@ -53,5 +56,9 @@ jobs:
         with:
           app-name: 'idpowertoys'
           slot-name: 'release'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_A36876CAC5624083A9D1F8A39D285D5F }}
           package: .
+
+      - name: logout
+        run: |
+            az logout        
+  
