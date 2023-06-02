@@ -231,7 +231,7 @@ public class DocumentGenerator
         ppt.Show(!grantControls.ApprovedApplication, Shape.ShadeGrantApprovedClientApp);
         ppt.Show(!grantControls.TermsOfUse, Shape.ShadeGrantTermsOfUse);
         ppt.Show(!grantControls.CustomAuthenticationFactor, Shape.ShadeGrantCustomAuthFactor);
-        ppt.Show(!grantControls.CompliantApplication, Shape.ShadeGrantApprovedClientApp);
+        ppt.Show(!grantControls.CompliantApplication, Shape.ShadeGrantAppProtectionPolicy);
         ppt.Show(!grantControls.CompliantDevice, Shape.ShadeGrantCompliantDevice);
         ppt.Show(!grantControls.AuthenticationStrength, Shape.ShadeGrantAuthStrength);
         ppt.Show(!grantControls.DomainJoinedDevice, Shape.ShadeGrantHybridAzureADJoined);

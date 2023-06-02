@@ -80,17 +80,29 @@ public class GraphData
 
     public string GetJsonFromPolicy(ConditionalAccessPolicy policy)
     {
-        //Use standard serialization for now.
-        return JsonSerializer.Serialize<ConditionalAccessPolicy>(policy, new JsonSerializerOptions { WriteIndented = true });
-        
-        //var seralizer = _graphHelper.GraphServiceClient.RequestAdapter.SerializationWriterFactory.GetSerializationWriter("application/json");
-        //seralizer.WriteObjectValue(string.Empty, policy);
-        //var serializedContent = seralizer.GetSerializedContent();
+        try
+        {
+            var seralizer = new JsonSerializationWriter();
+            seralizer.WriteObjectValue(string.Empty, policy);
+            var serializedContent = seralizer.GetSerializedContent();
 
-        //using (var sr = new StreamReader(serializedContent))
-        //{
-        //    return sr.ReadToEnd();
-        //}
+            using (var sr = new StreamReader(serializedContent))
+            {
+                var json = sr.ReadToEnd();
+                var jsonPretty = JsonPrettify(json);
+                return jsonPretty;
+            }
+        }
+        catch
+        {
+            return String.Empty;
+        }
+    }
+
+    public static string JsonPrettify(string json)
+    {
+        using var jDoc = JsonDocument.Parse(json);
+        return JsonSerializer.Serialize(jDoc, new JsonSerializerOptions { WriteIndented = true });
     }
 }
 
