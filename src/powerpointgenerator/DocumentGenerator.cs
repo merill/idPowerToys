@@ -13,10 +13,18 @@ public class DocumentGenerator
     #region GeneratePowerPoint overloads
     public void GeneratePowerPoint(GraphData graphData, Stream outputStream, ConfigOptions configOptions)
     {
-        Stream templateStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("IdPowerToys.PowerPointGenerator.Assets.PolicyTemplate.pptx");
+        Stream templateStream = GetPowerPointTemplateFromAssembly();
 
         IPresentation pptxDoc = Syncfusion.Presentation.Presentation.Open(templateStream);
         GeneratePowerPoint(graphData, pptxDoc, outputStream, configOptions);
+    }
+
+    private static Stream GetPowerPointTemplateFromAssembly(bool isImageExport = false)
+    {
+        var imageResource = isImageExport ?
+            "IdPowerToys.PowerPointGenerator.Assets.PolicyTemplateImage.pptx" :
+            "IdPowerToys.PowerPointGenerator.Assets.PolicyTemplate.pptx";
+        return Assembly.GetExecutingAssembly().GetManifestResourceStream(imageResource);
     }
 
     public void GeneratePowerPoint(GraphData graphData, Stream templateFile, Stream outputStream, ConfigOptions configOptions)
@@ -34,10 +42,25 @@ public class DocumentGenerator
 
     public void GeneratePowerPoint(GraphData graphData, IPresentation pptxDoc, Stream outputStream, ConfigOptions configOptions)
     {
+        GeneratePresentation(graphData, pptxDoc, configOptions);
+        pptxDoc.Save(outputStream);
+
+        pptxDoc.Close();
+    }
+
+    public IPresentation GetPresentation(GraphData graphData, ConfigOptions configOptions)
+    {
+        Stream templateStream = GetPowerPointTemplateFromAssembly(true);
+        IPresentation pptxDoc = Syncfusion.Presentation.Presentation.Open(templateStream);
+        GeneratePresentation(graphData, pptxDoc, configOptions);
+        return pptxDoc;
+    }
+
+
+    public void GeneratePresentation(GraphData graphData, IPresentation pptxDoc, ConfigOptions configOptions)
+    {
         _graphData = graphData;
         var policies = _graphData.Policies;
-
-        
 
         SetTitleSlideInfo(pptxDoc.Slides[0]);
         var templateSlide = pptxDoc.Slides[1];
@@ -55,9 +78,6 @@ public class DocumentGenerator
             }
         }
         pptxDoc.Slides.Remove(templateSlide);
-        pptxDoc.Save(outputStream);
-
-        pptxDoc.Close();
     }
 
     private void AddSlides(IPresentation pptxDoc, ICollection<ConditionalAccessPolicy> policies, string? sectionTitle, ConditionalAccessPolicyState? policyState)

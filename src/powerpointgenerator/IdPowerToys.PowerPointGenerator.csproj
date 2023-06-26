@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <None Remove="Assets\PolicyTemplate.pptx" />
+    <None Remove="Assets\PolicyTemplateImage.pptx" />
   </ItemGroup>
 
   <ItemGroup>
@@ -15,11 +16,12 @@
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="Assets\PolicyTemplateImage.pptx" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Graph.Beta" Version="5.22.0-preview" />
-    <PackageReference Include="Syncfusion.Presentation.Net.Core" Version="20.4.0.54" />
+    <PackageReference Include="Microsoft.Graph.Beta" Version="5.36.0-preview" />
+    <PackageReference Include="Syncfusion.Presentation.Net.Core" Version="21.2.8" />
   </ItemGroup>
 
 </Project>
