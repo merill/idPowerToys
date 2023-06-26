@@ -4,6 +4,14 @@
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>idPowerToys</Title>
+    <Authors>merill</Authors>
+    <Description>Library to create a PowerPoint presentation of conditional access policies of a Microsoft Entra tenant.</Description>
+    <PackageProjectUrl>https://github.com/merill/idPowerToys/</PackageProjectUrl>
+    <PackageIcon>idPowerToysLogo.png</PackageIcon>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>readme.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,8 +28,22 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\reactapp\public\idPowerToysLogo.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Graph.Beta" Version="5.36.0-preview" />
     <PackageReference Include="Syncfusion.Presentation.Net.Core" Version="21.2.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="readme.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
