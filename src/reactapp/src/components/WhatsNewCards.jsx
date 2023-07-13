@@ -77,7 +77,7 @@ const ConditionalAccessCard = (props) => {
                     />
 
                     <p className={styles.text}>
-                        Export your conditional access policies to PowerPoint for a bird's eye view of your security posture. Share you policies with security teams and stakeholders without giving admin access to Azure Active Directory.</p>
+                        Export your conditional access policies to PowerPoint for a bird's eye view of your security posture. Share you policies with security teams and stakeholders without granting them admin access to Microsoft Entra ID.</p>
                     <p className={styles.text}>
                         Your conditional access policies will never look the same again.
                     </p>
@@ -95,20 +95,20 @@ const ConditionalAccessCard = (props) => {
                     <CardPreview>
                         <img
                             src="./assets/whatsnew/mindmap.png"
-                            alt="Azure Active Directory Mind map"
+                            alt="Microsoft Entra Mind map"
                         />
                     </CardPreview>
 
                     <CardHeader
                         header={
                             <Body1>
-                                <b>Azure Active Directory Mind Map</b>
+                                <b>Microsoft Entra Mind Map</b>
                             </Body1>
                         }
                     />
 
                     <p className={styles.text}>
-                        The Azure Active Directory Mind Map is a visual representation of the Azure Active Directory service. It is a great way to learn about the Microsoft Identity platform and how it works.
+                        This mindmap is a visual guide to Microsoft Entra and provides a high level overview of all the new products in the service. This new update includes maps for Microsoft Entra and Microsoft Entra ID.
                     </p>
                     <p className={styles.text}>
                         Download the latest version of the mind map and share it with your team.
@@ -116,7 +116,7 @@ const ConditionalAccessCard = (props) => {
 
                     <CardFooter>
                         <Button appearance="primary" icon={<SlideLayout24Filled />}
-                            onClick={() => window.open('/assets/mindmaps/azureadv1.pdf', '_blank', 'noreferrer')}
+                            onClick={() => window.open('/assets/mindmaps/entra-v1.pdf', '_blank', 'noreferrer')}
                         >
                             View mind map
                         </Button>

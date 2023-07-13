@@ -18,7 +18,7 @@ export const NavBar = () => {
                     <Button appearance="secondary" onClick={() => navigate('/ca')} >CA Documenter</Button>
                 </li>
                 <li>
-                    <Button appearance="secondary" onClick={() => window.open('/assets/mindmaps/azureadv1.pdf', '_blank', 'noreferrer')} >Mind Map</Button>
+                    <Button appearance="secondary" onClick={() => window.open('/assets/mindmaps/entra-v1.pdf', '_blank', 'noreferrer')} >Mind Map</Button>
                 </li>
             </ul>
         </>
