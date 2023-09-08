@@ -38,7 +38,7 @@ public class PowerPointHelper
             {
                 var para = textBody.AddParagraph(line);
                 para.Font.FontSize = 11;
-                if (line.IndexOf("-") < 0)
+                if (!line.StartsWith("-"))
                 {
                     para.Font.Bold = true;
                 }
