@@ -20,7 +20,7 @@ public class ConditionClientAppTypes : PolicyView
             if (clientAppType == ConditionalAccessClientApp.All) { return string.Empty; } //CA blade shows "All" as 'Not configured' so we do the same and hide it in the doc
             if (clientAppType == ConditionalAccessClientApp.Browser) { AppendName(sb, "Browser"); }
             if (clientAppType == ConditionalAccessClientApp.MobileAppsAndDesktopClients) { AppendName(sb, "Mobile app and desktop clients"); }
-            if (clientAppType == ConditionalAccessClientApp.ExchangeActiveSync || clientAppType == ConditionalAccessClientApp.EasSupported) { AppendName(sb, " Exchange ActiveSync clients"); }
+            if (clientAppType == ConditionalAccessClientApp.ExchangeActiveSync || clientAppType == ConditionalAccessClientApp.EasSupported) { AppendName(sb, "Exchange ActiveSync clients"); }
             if (clientAppType == ConditionalAccessClientApp.Other) { AppendName(sb, "Other legacy clients"); }
         }
 
