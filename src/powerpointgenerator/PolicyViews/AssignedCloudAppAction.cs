@@ -110,6 +110,9 @@ public class AssignedCloudAppAction : PolicyView
                         IsSelectedAppO365Only = true;
                         Name = appId;
                     }
+                    else {
+                        AppendObjectName(sb, val);
+                    }
                 }
                 else
                 {
