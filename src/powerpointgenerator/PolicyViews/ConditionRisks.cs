@@ -16,7 +16,7 @@ public class ConditionRisks : PolicyView
     {
         var sb = new StringBuilder();
 
-        AppendRisk(sb, Policy.Conditions.UserRiskLevels, "User risk risk:");
+        AppendRisk(sb, Policy.Conditions.UserRiskLevels, "User risk:");
         AppendRisk(sb, Policy.Conditions.SignInRiskLevels, "Sign-in risk:");
         AppendRisk(sb, Policy.Conditions.ServicePrincipalRiskLevels, "Service principal risk:");
 
