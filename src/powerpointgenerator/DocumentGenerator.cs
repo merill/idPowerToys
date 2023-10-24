@@ -209,7 +209,7 @@ public class DocumentGenerator
         if (conditionLocations.HasData) ppt.SetTextFormatted(Shape.Locations, conditionLocations.IncludeExclude);
         ppt.Show(!conditionLocations.HasData, Shape.ShadeLocations);
 
-        if (conditionDeviceFilters.HasData) ppt.SetTextFormatted(Shape.DeviceFilters, conditionDeviceFilters.IncludeExclude);
+        if (conditionDeviceFilters.HasData) ppt.SetTextFormatted(Shape.DeviceFilters, conditionDeviceFilters.IncludeExclude, false);
         ppt.Show(!conditionDeviceFilters.HasData, Shape.ShadeFilterForDevices);
     }
 

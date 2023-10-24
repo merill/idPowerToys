@@ -26,7 +26,7 @@ public class PowerPointHelper
         _shapes[shape.ToString()].TextBody.Text = text;
     }
 
-    public void SetTextFormatted(Shape shape, string? text)
+    public void SetTextFormatted(Shape shape, string? text, bool applyBold=true)
     {
         var textBody = _shapes[shape.ToString()].TextBody;
         for (int i = 0; i <= textBody.Paragraphs.Count(); i++) { textBody.Paragraphs.RemoveAt(0); }
@@ -38,7 +38,7 @@ public class PowerPointHelper
             {
                 var para = textBody.AddParagraph(line);
                 para.Font.FontSize = 11;
-                if (!line.Trim().StartsWith("-"))
+                if (!line.Trim().StartsWith("-") && applyBold)
                 {
                     para.Font.Bold = true;
                 }
