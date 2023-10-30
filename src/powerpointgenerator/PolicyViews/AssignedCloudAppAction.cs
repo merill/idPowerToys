@@ -17,6 +17,8 @@ public class AssignedCloudAppAction : PolicyView
 {
     public AppAccessType AccessType { get; set; }
     public bool IsSelectedAppO365Only { get; set; }
+    public bool IsSelectedMicrosoftAdminPortalsOnly { get; set; }
+
     private bool _isIncludeAppFilter = false, _isExcludeAppFilter = false;
     private string? _appFilterRule;
 
@@ -35,6 +37,7 @@ public class AssignedCloudAppAction : PolicyView
 
         AccessType = GetAccessType();
         IsSelectedAppO365Only = false; //Default to false. We show special icon for O365.
+        IsSelectedMicrosoftAdminPortalsOnly = false;
 
         switch (AccessType)
         {
@@ -114,6 +117,20 @@ public class AssignedCloudAppAction : PolicyView
                         AppendObjectName(sb, val);
                     }
                 }
+
+                else if (appId == "MicrosoftAdminPortals")
+                {
+                    appId = "Microsoft Admin Portals"; //Format it to include space
+                    if (appCount == 1 &&  !_isIncludeAppFilter) //If there is only one app included and it is O365 set to true to show O365 icon on page
+                    {
+                        IsSelectedMicrosoftAdminPortalsOnly = true;
+                        Name = appId;
+                    }
+                    else {
+                        AppendObjectName(sb, val);
+                    }
+                }
+
                 else
                 {
                     AppendObjectName(sb, val);
