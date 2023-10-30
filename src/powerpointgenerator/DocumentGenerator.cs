@@ -83,6 +83,7 @@ public class DocumentGenerator
     private void AddSlides(IPresentation pptxDoc, ICollection<ConditionalAccessPolicy> policies, string? sectionTitle, ConditionalAccessPolicyState? policyState)
     {
         var filteredPolicies = policyState == null
+            //? from p in policies where p.Id == "6c0ef46a-3b58-43a9-b451-7464a16d91d7" orderby p.DisplayName select p
             ? from p in policies orderby p.DisplayName select p
             : from p in policies where p.State == policyState orderby p.DisplayName select p;
 
@@ -178,13 +179,20 @@ public class DocumentGenerator
     {
         ppt.SetText(Shape.CloudAppAction, assignedCloudAppAction.Name);
         ppt.SetTextFormatted(Shape.CloudAppActionIncExc, assignedCloudAppAction.IncludeExclude);
-        ppt.Show(assignedCloudAppAction.HasData && !assignedCloudAppAction.IsSelectedAppO365Only, Shape.CloudAppActionIncExc);
+        ppt.Show(assignedCloudAppAction.HasData
+            && !assignedCloudAppAction.IsSelectedAppO365Only
+            && !assignedCloudAppAction.IsSelectedMicrosoftAdminPortalsOnly,
+            Shape.CloudAppActionIncExc);
         ppt.Show(assignedCloudAppAction.AccessType == AppAccessType.AppsAll,
             Shape.IconAccessAllCloudApps);
-        ppt.Show(assignedCloudAppAction.AccessType == AppAccessType.AppsSelected && !assignedCloudAppAction.IsSelectedAppO365Only,
+        ppt.Show(assignedCloudAppAction.AccessType == AppAccessType.AppsSelected
+            && !assignedCloudAppAction.IsSelectedAppO365Only
+            && !assignedCloudAppAction.IsSelectedMicrosoftAdminPortalsOnly,
             Shape.IconAccessSelectedCloudApps);
         ppt.Show(assignedCloudAppAction.IsSelectedAppO365Only,
             Shape.IconAccessOffice365, Shape.PicAccessOffice365);
+        ppt.Show(assignedCloudAppAction.IsSelectedMicrosoftAdminPortalsOnly,
+            Shape.IconMicrosoftAdminPortal);
         ppt.Show(assignedCloudAppAction.AccessType == AppAccessType.UserActionsRegSecInfo,
             Shape.IconAccessMySecurityInfo, Shape.PicAccessSecurityInfo);
         ppt.Show(assignedCloudAppAction.AccessType == AppAccessType.UserActionsRegDevice,

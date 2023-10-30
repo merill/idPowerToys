@@ -47,6 +47,7 @@ public enum Shape
     IconGrantTermsOfUseLabel,
     IconGroupIdentity,
     IconLocations,
+    IconMicrosoftAdminPortal,
     IconPlatforms,
     IconRiskyUsers,
     IconSessionCaeDisable,
