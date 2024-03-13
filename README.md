@@ -1,6 +1,6 @@
 # Identity Power Toys
 
-This is the code repository for the [idPowerToys](https://idpowertoys.com) app. 
+This is the code repository for the [idPowerToys](https://idpowertoys.merill.net) app. 
 
 idPowerToys is a collection of applications for Azure Active Directory power users. 
 
