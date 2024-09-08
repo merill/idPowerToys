@@ -58,10 +58,10 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="label6.Text" xml:space="preserve">
-    <value>Follow these instructions to create your own application for use with idPowerToys.
+    <value>Follow these instructions to create your own application for use with idPowerApp.
 
 1. Browse to Azure Portal &gt; Azure Active Directory &gt; App registrations &gt; New registrations
-   - Type in a name e.g. My idPowerToys and select Register
+   - Type in a name e.g. My idPowerApp and select Register
 2. Select Authentication &gt; Add a platform &gt; Mobile and desktop applications
    - Set Custom redirect URIs to http://localhost and select Configure
 3. Select Overview and copy the following values into the form below

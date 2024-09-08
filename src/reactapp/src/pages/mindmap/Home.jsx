@@ -12,9 +12,9 @@ function Home() {
 
     return (
         <>
-            <span className={styles.text}>Azure Active Directory Mind Map</span>
+            <span className={styles.text}>Microsoft Entra Mind Map</span>
             <div className="App">
-                <a href={aadmindmap} target="_blank">Download Azure AD Mind Map</a>
+                <a href={aadmindmap} target="_blank">Download Microsoft Entra Mind Map</a>
             </div>
 
             <iframe src='/assets/mindmaps/azureadv1.pdf#toolbar=0' type="application/pdf" width='300px' height='310px'></iframe>

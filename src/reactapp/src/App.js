@@ -14,7 +14,7 @@ function App() {
     // for dynamic title, put the dynamic values inside the array
     // see: https://reactjs.org/docs/hooks-effect.html#tip-optimizing-performance-by-skipping-effects
     useEffect(() => {
-        document.title = 'idPowerToys ' + envConfig.envName;
+        document.title = 'idPowerApp ' + envConfig.envName;
     }, []);
 
     return (

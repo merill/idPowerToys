@@ -276,7 +276,7 @@
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             Name = "MainForm";
-            Text = "idPowerToys - Conditional Access Documenter";
+            Text = "idPowerApp - Conditional Access Documenter";
             tabControl1.ResumeLayout(false);
             tabPage1.ResumeLayout(false);
             tabPage1.PerformLayout();

@@ -42,7 +42,7 @@ public class AssignedCloudAppAction : PolicyView
         switch (AccessType)
         {
             case AppAccessType.AppsNone:
-                Name = "Azure Active Directory"; //Just show Azure AD icon Only happens with Workload Identities and a block policy
+                Name = "Microsoft Entra"; //Just show Azure AD icon Only happens with Workload Identities and a block policy
                 IncludeExclude = string.Empty;
                 break;
             case AppAccessType.AppsAll:

@@ -42,7 +42,7 @@ export const CaDocGenManual = () => {
     return (
         <>
             <div className={styles.base}>
-                <p>Use this option to manually generate the documentation without signing into idPowerToys.</p>
+                <p>Use this option to manually generate the documentation without signing into idPowerApp.</p>
                 <p>Documentation generated manually will not include the names of users, apps and other directory objects.</p>
 
                 <Accordion collapsible={true}>
