@@ -116,7 +116,7 @@ const ConditionalAccessCard = (props) => {
 
                     <CardFooter>
                         <Button appearance="primary" icon={<SlideLayout24Filled />}
-                            onClick={() => window.open('/assets/mindmaps/entra-v1.pdf', '_blank', 'noreferrer')}
+                            onClick={() => window.open('https://entra.news/p/entra-mind-maps', '_blank')}
                         >
                             View mind map
                         </Button>
